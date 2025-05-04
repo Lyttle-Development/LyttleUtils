@@ -17,7 +17,7 @@ public class Console {
      * Initialize the Console class
      * @param plugin The plugin instance
      */
-    public static void init(JavaPlugin plugin) {
+    public Console(JavaPlugin plugin) {
         Console.plugin = plugin;
     }
 

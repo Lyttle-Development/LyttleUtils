@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Config {
+public abstract class Config {
     private final String pluginFolderPath;
     private final String configPath;
     private YamlConfiguration config = null;
@@ -85,10 +85,7 @@ public class Config {
     }
 
     public @Nullable Object get(String path) {
-        plugin.getLogger().info("Config path: " + this.pluginFolderPath + File.separator + this.configPath);
         YamlConfiguration cfg = this.getConfig();
-        // print the config
-        plugin.getLogger().info("Config: " + cfg.saveToString());
         if (cfg.contains(path)) {
             return cfg.get(path);
         } else {

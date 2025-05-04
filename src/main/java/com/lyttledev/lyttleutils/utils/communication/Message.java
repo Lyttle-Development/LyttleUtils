@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * Message class to handle sending messages to players and console.
  * It uses MiniMessage for formatting and supports message replacement.
  */
-public abstract class Message {
+public class Message {
     public static JavaPlugin plugin;
     public static Config messages;
 
@@ -24,7 +24,7 @@ public abstract class Message {
      * @param plugin  The JavaPlugin instance
      * @param messages The Config instance for messages
      */
-    public static void init(JavaPlugin plugin, Config messages) {
+    public Message(JavaPlugin plugin, Config messages) {
         Message.plugin = plugin;
         Message.messages = messages;
     }
