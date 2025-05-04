@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 public class Message {
     public static JavaPlugin plugin;
     public static Config messages;
-    static FileConfiguration config = plugin.getConfig();
 
     /**
      * Initialize the Message class with the plugin instance and messages configuration.
