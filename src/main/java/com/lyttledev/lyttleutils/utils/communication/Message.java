@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,7 +14,7 @@ import javax.annotation.Nullable;
  * Message class to handle sending messages to players and console.
  * It uses MiniMessage for formatting and supports message replacement.
  */
-public class Message {
+public abstract class Message {
     public static JavaPlugin plugin;
     public static Config messages;
 

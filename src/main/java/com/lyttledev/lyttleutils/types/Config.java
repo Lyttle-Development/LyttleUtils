@@ -21,6 +21,8 @@ public class Config {
         this.pluginFolderPath = plugin.getDataFolder().getPath();
         this.configPath = configPath;
         this.plugin = plugin;
+        // Print path
+        plugin.getLogger().info("Config path: " + this.pluginFolderPath + File.separator + this.configPath);
     }
 
     private YamlConfiguration getConfig() {
@@ -83,7 +85,10 @@ public class Config {
     }
 
     public @Nullable Object get(String path) {
+        plugin.getLogger().info("Config path: " + this.pluginFolderPath + File.separator + this.configPath);
         YamlConfiguration cfg = this.getConfig();
+        // print the config
+        plugin.getLogger().info("Config: " + cfg.saveToString());
         if (cfg.contains(path)) {
             return cfg.get(path);
         } else {
