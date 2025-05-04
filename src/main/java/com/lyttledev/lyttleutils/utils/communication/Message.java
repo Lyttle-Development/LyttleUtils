@@ -15,8 +15,8 @@ import javax.annotation.Nullable;
  * It uses MiniMessage for formatting and supports message replacement.
  */
 public class Message {
-    public static JavaPlugin plugin;
-    public static Config messages;
+    private final JavaPlugin plugin;
+    private final Config messages;
 
     /**
      * Initialize the Message class with the plugin instance and messages configuration.
@@ -25,8 +25,8 @@ public class Message {
      * @param messages The Config instance for messages
      */
     public Message(JavaPlugin plugin, Config messages) {
-        Message.plugin = plugin;
-        Message.messages = messages;
+        this.plugin = plugin;
+        this.messages = messages;
     }
 
     /**
@@ -34,7 +34,7 @@ public class Message {
      *
      * @return The prefix string
      */
-    private static String _getPrefix() {
+    private String _getPrefix() {
         return _getConfigMessage("prefix");
     }
 
@@ -44,7 +44,7 @@ public class Message {
      * @param messageKey The key for the message
      * @return The message string
      */
-    private static String _getConfigMessage(String messageKey) {
+    private String _getConfigMessage(String messageKey) {
         @Nullable String message = (String) messages.get(messageKey);
         if (message == null) {
             Console.log("Message key " + messageKey + " not found in messages.yml");
@@ -65,7 +65,7 @@ public class Message {
      * @param messageKey The key for the message
      * @return The message string
      */
-    public static String getConfigMessage(String messageKey) {
+    public String getConfigMessage(String messageKey) {
         return _getConfigMessage(messageKey);
     }
 
@@ -76,7 +76,7 @@ public class Message {
      * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
-    private static String _replaceMessageStrings(String message, String[][] replacements) {
+    private String _replaceMessageStrings(String message, String[][] replacements) {
         for (String[] replacement : replacements) {
             message = message.replace(replacement[0], replacement[1]);
         }
@@ -89,7 +89,7 @@ public class Message {
      * @param target The target to send the message to
      * @param messageKey The key for the message
      */
-    public static void sendMessage(Object target, String messageKey) {
+    public void sendMessage(Object target, String messageKey) {
         Component msg = _getMessage(_getPrefix() + _getConfigMessage(messageKey));
         _sendMessage(target, msg);
     }
@@ -101,7 +101,7 @@ public class Message {
      * @param message The message string
      * @param replacements The replacements to be made in the message
      */
-    public static void sendMessage(Object target, String message, String[][] replacements) {
+    public void sendMessage(Object target, String message, String[][] replacements) {
         Component msg = _getMessage(_getPrefix() + _replaceMessageStrings(_getConfigMessage(message), replacements));
         _sendMessage(target, msg);
     }
@@ -112,7 +112,7 @@ public class Message {
      * @param target The target to send the message to
      * @param message The message string
      */
-    public static void sendMessageRaw(Object target, String message) {
+    public void sendMessageRaw(Object target, String message) {
         Component msg = _getMessage(_getPrefix() + message);
         _sendMessage(target, msg);
     }
@@ -123,7 +123,7 @@ public class Message {
      * @param target The target to send the message to
      * @param message The message string
      */
-    private static void _sendMessage(Object target, Component message) {
+    private void _sendMessage(Object target, Component message) {
         if (target instanceof Player) {
             ((Player) target).sendMessage(message);
         }
@@ -138,7 +138,7 @@ public class Message {
      * @param message The message string
      * @param replacements The replacements to be made in the message
      */
-    public static void sendBroadcast(String message, String[][] replacements) {
+    public void sendBroadcast(String message, String[][] replacements) {
         String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
         Bukkit.broadcast(_getMessage(msg));
     }
@@ -150,7 +150,7 @@ public class Message {
      * @param replacements The replacements to be made in the message
      * @param prefix Whether to include the prefix or not
      */
-    public static void sendBroadcast(String message, String[][] replacements, boolean prefix) {
+    public void sendBroadcast(String message, String[][] replacements, boolean prefix) {
         String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
         sendBroadcast(msg, prefix);
     }
@@ -161,7 +161,7 @@ public class Message {
      * @param message The message string
      * @param prefix Whether to include the prefix or not
      */
-    public static void sendBroadcast(String message, boolean prefix) {
+    public void sendBroadcast(String message, boolean prefix) {
         if (prefix) {
             Bukkit.broadcast(_getMessage(_getPrefix() + message));
             return;
@@ -174,7 +174,7 @@ public class Message {
      *
      * @param message The message string
      */
-    public static void sendBroadcast(String message) {
+    public void sendBroadcast(String message) {
         Bukkit.broadcast(_getMessage(message));
     }
 
@@ -184,7 +184,7 @@ public class Message {
      * @param message The message string
      * @return The formatted message string
      */
-    private static Component _getMessage(String message) {
+    private Component _getMessage(String message) {
         // Replace all \n with real newlines
         message = message.replace("\\n", "\n");
         return MiniMessage.miniMessage().deserialize(message);
@@ -196,7 +196,7 @@ public class Message {
      * @param message The message string
      * @return The formatted message string
      */
-    public static Component getMessage(String message) {
+    public Component getMessage(String message) {
         return _getMessage(_getConfigMessage(message));
     }
 
@@ -207,7 +207,7 @@ public class Message {
      * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
-    public static Component getMessage(String message, String[][] replacements) {
+    public Component getMessage(String message, String[][] replacements) {
         return _getMessage(_replaceMessageStrings(_getConfigMessage(message), replacements));
     }
 }
