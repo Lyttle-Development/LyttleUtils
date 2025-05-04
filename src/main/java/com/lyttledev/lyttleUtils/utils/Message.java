@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public class Message {
     public static LyttleUtils plugin;
     static FileConfiguration config = plugin.getConfig();
@@ -79,11 +80,7 @@ public class Message {
 
     public static void sendBroadcast(String message, String[][] replacements, boolean prefix) {
         String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
-        if (prefix) {
-            Bukkit.broadcast(_getMessage(_getPrefix() + msg));
-            return;
-        }
-        Bukkit.broadcast(_getMessage(msg));
+        sendBroadcast(msg, prefix);
     }
 
     public static void sendBroadcast(String message, boolean prefix) {
