@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id 'maven-publish'
 }
 
 group = 'com.lyttledev'
@@ -55,5 +56,28 @@ processResources {
     filteringCharset 'UTF-8'
     filesMatching('plugin.yml') {
         expand props
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.lyttledev'
+            artifactId = 'lyttleutils'
+            version = '1.0.0' // Update as needed
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Lyttle-Development/LyttleUtils")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GPR_API_KEY")
+            }
+        }
     }
 }
