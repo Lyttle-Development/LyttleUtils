@@ -82,7 +82,7 @@ val versionString: String =  if (System.getenv("CHANNEL") == "Release") {
     }
 
     if (System.getenv("GITHUB_RUN_NUMBER") != null) {
-        "${version}-${versionPrefix}+${System.getenv("GITHUB_RUN_NUMBER")}"
+        "${version}-${versionPrefix}.${System.getenv("GITHUB_RUN_NUMBER")}"
     } else {
         "$version-${versionPrefix}"
     }
