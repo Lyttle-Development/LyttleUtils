@@ -1,75 +1,80 @@
+import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {
-    `java-library`
+    java
     `maven-publish`
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("co.uzzu.dotenv.gradle") version "4.0.0"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
+// Project coordinates
 group = "com.lyttledev"
 version = (property("pluginVersion") as String)
 description = "LyttleUtils"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
+// Java toolchain and compatibility
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
+// Repositories
+repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://oss.sonatype.org/content/groups/public/")
+    maven("https://jitpack.io")
+    maven("https://repo.maven.apache.org/maven2/")
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/Lyttle-Development/LyttleUtils")
+        credentials {
+            username = System.getenv("GPR_USER") ?: project.findProperty("gpr.user") as String?
+            password = System.getenv("GPR_API_KEY") ?: project.findProperty("gpr.key") as String?
+        }
+    }
+}
+
+// Dependencies
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 }
 
+// run-paper plugin configuration
 tasks {
     runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21")
     }
 }
 
-def targetJavaVersion = 21
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release.set(targetJavaVersion)
-    }
-}
-
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
-}
-
-tasks.withType<JavaCompile>() {
+// Compile options
+tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
+    if (JavaVersion.current().isJava10Compatible()) {
+        options.release.set(21)
+    }
 }
 
-tasks.withType<Javadoc>() {
-    options.encoding = "UTF-8"
+// Git helper functions
+fun executeGitCommand(vararg command: String): String {
+    val output = ByteArrayOutputStream()
+    exec {
+        commandLine = listOf("git", *command)
+        standardOutput = output
+    }
+    return output.toString(Charsets.UTF_8.name()).trim()
 }
 
-// Add -SNAPSHOT to the version if the channel is not Release
-val versionString: String = if (System.getenv("CHANNEL") == "Release") {
+fun latestCommitMessage(): String = executeGitCommand("log", "-1", "--pretty=%B")
+
+// Version string logic
+val versionString: String =  if (System.getenv("CHANNEL") == "Release") {
     version.toString()
 } else {
     val versionPrefix = if (System.getenv("CHANNEL") == "Snapshot") {
@@ -85,32 +90,40 @@ val versionString: String = if (System.getenv("CHANNEL") == "Release") {
     }
 }
 
+// Process resources: expand plugin.yml
 tasks.named<ProcessResources>("processResources") {
+    inputs.property("version", versionString)
+    filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
-        expand("projectVersion" to versionString)
+        expand(
+            "version" to versionString,
+            "projectVersion" to versionString
+        )
     }
 }
 
-
+// Publishing to Maven (GitHub Packages)
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            groupId = 'com.lyttledev'
-            artifactId = 'lyttleutils'
-            version = '1.0.0' // Update as needed
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = "lyttleutils"
+            version = versionString
         }
     }
-
     repositories {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/Lyttle-Development/LyttleUtils")
             credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
-                password = project.findProperty("gpr.key") ?: System.getenv("GPR_API_KEY")
+                username = System.getenv("GPR_USER") ?: project.findProperty("gpr.user") as String?
+                password = System.getenv("GPR_API_KEY") ?: project.findProperty("gpr.key") as String?
             }
         }
     }
 }
+
+// Logging
+println("Version: $versionString")
+println("Changelog: ${latestCommitMessage()}")
