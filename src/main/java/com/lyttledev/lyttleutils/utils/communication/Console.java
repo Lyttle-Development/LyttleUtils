@@ -1,4 +1,4 @@
-package com.lyttledev.lyttleutils.utils;
+package com.lyttledev.lyttleutils.utils.communication;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
