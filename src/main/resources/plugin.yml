@@ -1,4 +1,0 @@
-name: Lyttle-Utils
-version: '1.0-SNAPSHOT'
-main: com.lyttledev.lyttleUtils.LyttleUtils
-api-version: '1.21'
