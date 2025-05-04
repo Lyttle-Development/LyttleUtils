@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public abstract class Config {
+public class Config {
     private final String pluginFolderPath;
     private final String configPath;
     private YamlConfiguration config = null;
