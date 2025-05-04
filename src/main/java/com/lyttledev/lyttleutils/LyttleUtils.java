@@ -1,9 +1,7 @@
-package com.lyttledev.lyttleUtils;
+package com.lyttledev.lyttleutils;
 
 // Export the classes to be used in the plugin
-import com.lyttledev.lyttleUtils.utils.Console;
-import com.lyttledev.lyttleUtils.types.Config;
-import com.lyttledev.lyttleUtils.utils.Message;
+import com.lyttledev.lyttleutils.utils.Console;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

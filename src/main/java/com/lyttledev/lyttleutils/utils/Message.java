@@ -1,6 +1,6 @@
-package com.lyttledev.lyttleUtils.utils;
+package com.lyttledev.lyttleutils.utils;
 
-import com.lyttledev.lyttleUtils.types.Config;
+import com.lyttledev.lyttleutils.types.Config;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;

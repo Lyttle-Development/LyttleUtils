@@ -1,6 +1,6 @@
-package com.lyttledev.lyttleUtils.types;
+package com.lyttledev.lyttleutils.types;
 
-import com.lyttledev.lyttleUtils.LyttleUtils;
+import com.lyttledev.lyttleutils.LyttleUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
