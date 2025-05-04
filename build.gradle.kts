@@ -1,11 +1,15 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
-    id 'java'
+    `java-library`
+    `maven-publish`
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id 'maven-publish'
 }
 
-group = 'com.lyttledev'
-version = '1.0-SNAPSHOT'
+group = "com.lyttledev"
+version = (property("pluginVersion") as String)
+description = "LyttleUtils"
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenCentral()
@@ -50,14 +54,43 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
     }
 }
+
+tasks.withType<JavaCompile>() {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<Javadoc>() {
+    options.encoding = "UTF-8"
+}
+
+// Add -SNAPSHOT to the version if the channel is not Release
+val versionString: String = if (System.getenv("CHANNEL") == "Release") {
+    version.toString()
+} else {
+    val versionPrefix = if (System.getenv("CHANNEL") == "Snapshot") {
+        "SNAPSHOT"
+    } else {
+        "ALPHA"
+    }
+
+    if (System.getenv("GITHUB_RUN_NUMBER") != null) {
+        "${version}-${versionPrefix}+${System.getenv("GITHUB_RUN_NUMBER")}"
+    } else {
+        "$version-${versionPrefix}"
+    }
+}
+
+tasks.named<ProcessResources>("processResources") {
+    filesMatching("plugin.yml") {
+        expand("projectVersion" to versionString)
+    }
+}
+
 
 publishing {
     publications {
