@@ -1,12 +1,10 @@
-import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {
     java
+    `java-library`
     `maven-publish`
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("co.uzzu.dotenv.gradle") version "4.0.0"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 // Project coordinates
