@@ -1,4 +1,9 @@
 name: LyttleUtils
+description: Utility plugin for LyttleDevelopment plugins. (This prevents duplicate code, and allows for easier updates)
 version: '${projectVersion}'
 main: com.lyttledev.lyttleutils.LyttleUtils
 api-version: '1.21'
+authors:
+  - LyttleDevelopment
+  - ThatsATim
+  - Stualyttle
