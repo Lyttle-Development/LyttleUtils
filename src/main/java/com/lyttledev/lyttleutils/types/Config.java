@@ -1,9 +1,9 @@
 package com.lyttledev.lyttleutils.types;
 
-import com.lyttledev.lyttleutils.LyttleUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -15,9 +15,9 @@ public class Config {
     private final String pluginFolderPath;
     private final String configPath;
     private YamlConfiguration config = null;
-    private final LyttleUtils plugin;
+    private final JavaPlugin plugin;
 
-    public Config(LyttleUtils plugin, String configPath) {
+    public Config(JavaPlugin plugin, String configPath) {
         this.pluginFolderPath = plugin.getDataFolder().getPath();
         this.configPath = configPath;
         this.plugin = plugin;

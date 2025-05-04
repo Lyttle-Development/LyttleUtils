@@ -29,14 +29,6 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
     maven("https://jitpack.io")
     maven("https://repo.maven.apache.org/maven2/")
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/Lyttle-Development/LyttleUtils")
-        credentials {
-            username = System.getenv("GPR_USER") ?: project.findProperty("gpr.user") as String?
-            password = System.getenv("GPR_API_KEY") ?: project.findProperty("gpr.key") as String?
-        }
-    }
 }
 
 // Dependencies
