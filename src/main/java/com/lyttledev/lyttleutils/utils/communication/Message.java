@@ -191,6 +191,23 @@ public class Message {
         return MiniMessage.miniMessage().deserialize(message);
     }
 
+    /**
+     * Get a message from the messages configuration without the prefix.
+     *
+     * @param message The message string
+     * @return The formatted message string
+     */
+    public static Component getMessage(String message) {
+        return _getMessage(_getConfigMessage(message));
+    }
+
+    /**
+     * Get a message from the messages configuration with replacements.
+     *
+     * @param message The message string
+     * @param replacements The replacements to be made in the message
+     * @return The formatted message string
+     */
     public static Component getMessage(String message, String[][] replacements) {
         return _getMessage(_replaceMessageStrings(_getConfigMessage(message), replacements));
     }
