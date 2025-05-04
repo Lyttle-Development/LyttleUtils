@@ -3,11 +3,12 @@ package com.lyttledev.lyttleUtils.utils;
 import com.lyttledev.lyttleUtils.LyttleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Console {
-    public static LyttleUtils plugin;
+    public static JavaPlugin plugin;
 
-    public static void init(LyttleUtils plugin) {
+    public static void init(JavaPlugin plugin) {
         Console.plugin = plugin;
     }
 

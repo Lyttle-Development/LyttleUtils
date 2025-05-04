@@ -1,4 +1,4 @@
 name: Lyttle-Utils
-version: '1.0-SNAPSHOT'
+version: '${projectVersion}'
 main: com.lyttledev.lyttleUtils.LyttleUtils
 api-version: '1.21'

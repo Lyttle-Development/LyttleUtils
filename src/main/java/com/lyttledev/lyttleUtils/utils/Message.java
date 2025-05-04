@@ -1,22 +1,24 @@
 package com.lyttledev.lyttleUtils.utils;
 
-import com.lyttledev.lyttleUtils.LyttleUtils;
+import com.lyttledev.lyttleUtils.types.Config;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("unused")
 public class Message {
-    public static LyttleUtils plugin;
+    public static JavaPlugin plugin;
+    public static Config messages;
     static FileConfiguration config = plugin.getConfig();
 
-    public static void init(LyttleUtils plugin) {
+    public static void init(JavaPlugin plugin, Config messages) {
         Message.plugin = plugin;
+        Message.messages = messages;
     }
 
     private static String _getPrefix() {
@@ -24,10 +26,10 @@ public class Message {
     }
 
     private static String _getConfigMessage(String messageKey) {
-        @Nullable String message = (String) plugin.config.messages.get(messageKey);
+        @Nullable String message = (String) messages.get(messageKey);
         if (message == null) {
             Console.log("Message key " + messageKey + " not found in messages.yml");
-            message = (String) plugin.config.messages.get("message_not_found");
+            message = (String) messages.get("message_not_found");
         }
 
         if (message == null) {
