@@ -1,5 +1,6 @@
 package com.lyttledev.lyttleutils.utils.storage;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,22 +16,26 @@ public class Memory<K, V> {
     private final Map<K, V> valueMap = new HashMap<>();
 
     // Add value associated with a key
-    public void addvalue(K key, V value) {
+    public void addValue(K key, V value) {
         valueMap.put(key, value);
     }
 
     // Remove value associated with a key
-    public void removevalue(K key) {
+    public void removeValue(K key) {
         valueMap.remove(key);
     }
 
     // Get value associated with a key
-    public Object getvalue(K key) {
+    public Object getValue(K key) {
         return valueMap.get(key);
     }
 
+    public Collection<V> getAllValues() {
+        return valueMap.values();
+    }
+
     // Check if value exists for a given key
-    public boolean hasvalue(K key) {
+    public boolean hasValue(K key) {
         return valueMap.containsKey(key);
     }
 }
