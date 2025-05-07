@@ -21,8 +21,6 @@ public class Config {
         this.pluginFolderPath = plugin.getDataFolder().getPath();
         this.configPath = configPath;
         this.plugin = plugin;
-        // Print path
-        plugin.getLogger().info("Config path: " + this.pluginFolderPath + File.separator + this.configPath);
     }
 
     private YamlConfiguration getConfig() {
