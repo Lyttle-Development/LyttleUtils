@@ -126,9 +126,7 @@ The folder serves several important purposes: `#defaults`
 3. **Update Safety**: Preserved during plugin updates
 4. **Documentation**: Shows all available options with comments
 
-
 > 💡 **Never modify files in the #defaults folder!** They are automatically overwritten during server restarts.
->
 
 ---
 
