@@ -75,15 +75,16 @@ public class Message {
      *
      * @param message      The message string
      * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
      * @return The formatted message string
      */
-    private String _replaceMessageStrings(String message, String[][] replacements) {
+    private String _replaceMessageStrings(String message, String[][] replacements, @Nullable Player player) {
         for (String[] replacement : replacements) {
             message = message.replace(replacement[0], replacement[1]);
         }
 
         // Replace all PlaceholderAPI placeholders
-        Placeholder.parsePlaceholders(message);
+        Placeholder.parsePlaceholders(player, message);
 
         return message;
     }
@@ -105,10 +106,22 @@ public class Message {
      * @param target       The target to send the message to
      * @param message      The message string
      * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     */
+    public void sendMessage(Object target, String message, String[][] replacements, @Nullable Player player) {
+        Component msg = _getMessage(_getPrefix() + _replaceMessageStrings(_getConfigMessage(message), replacements, player));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a message to a target (Player or ConsoleCommandSender) with replacements.
+     *
+     * @param target       The target to send the message to
+     * @param message      The message string
+     * @param replacements The replacements to be made in the message
      */
     public void sendMessage(Object target, String message, String[][] replacements) {
-        Component msg = _getMessage(_getPrefix() + _replaceMessageStrings(_getConfigMessage(message), replacements));
-        _sendMessage(target, msg);
+        sendMessage(target, message, replacements, null);
     }
 
     /**
@@ -142,11 +155,36 @@ public class Message {
      *
      * @param message      The message string
      * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
      */
-    public void sendBroadcast(String message, String[][] replacements) {
-        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
+    public void sendBroadcast(String message, String[][] replacements, @Nullable Player player) {
+        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements, player);
         Bukkit.broadcast(_getMessage(msg));
     }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message      The message string
+     * @param replacements The replacements to be made in the message
+     */
+    public void sendBroadcast(String message, String[][] replacements) {
+        sendBroadcast(message, replacements, null);
+    }
+
+    /**
+     * Send a message to all players on the server with a prefix.
+     *
+     * @param message      The message string
+     * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     * @param prefix       Whether to include the prefix or not
+     */
+    public void sendBroadcast(String message, String[][] replacements, boolean prefix, @Nullable Player player) {
+        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements, player);
+        sendBroadcast(msg, prefix);
+    }
+
 
     /**
      * Send a message to all players on the server with a prefix.
@@ -156,8 +194,7 @@ public class Message {
      * @param prefix       Whether to include the prefix or not
      */
     public void sendBroadcast(String message, String[][] replacements, boolean prefix) {
-        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
-        sendBroadcast(msg, prefix);
+        sendBroadcast(message, replacements, prefix, null);
     }
 
     /**
@@ -210,9 +247,21 @@ public class Message {
      *
      * @param message      The message string
      * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     * @return The formatted message string
+     */
+    public Component getMessage(String message, String[][] replacements, @Nullable Player player) {
+        return _getMessage(_replaceMessageStrings(_getConfigMessage(message), replacements, player));
+    }
+
+    /**
+     * Get a message from the messages configuration with replacements.
+     *
+     * @param message      The message string
+     * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
     public Component getMessage(String message, String[][] replacements) {
-        return _getMessage(_replaceMessageStrings(_getConfigMessage(message), replacements));
+        return getMessage(message, replacements, null);
     }
 }
