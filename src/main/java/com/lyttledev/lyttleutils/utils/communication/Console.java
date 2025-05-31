@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Console class to run commands and log messages to the console
+ *
  * @author LyttleDev
  * @version 1.0
  */
@@ -25,10 +26,10 @@ public class Console {
      * Run a command as the console
      * @param command The command to run
      */
-    public static void run(String command) {
+    public void run(String command) {
         if (command == null || command.isEmpty()) return;
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        Bukkit.getScheduler().callSyncMethod( plugin, () -> Bukkit.dispatchCommand( console, command ) );
+        Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.dispatchCommand(console, command));
     }
 
     /*
@@ -36,7 +37,7 @@ public class Console {
      * @param player The player to run the command as
      * @param command The command to run
      */
-    public static void run(Player player, String command) {
+    public void run(Player player, String command) {
         if (command == null || command.isEmpty()) return;
         Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.dispatchCommand(player, command));
     }
@@ -45,7 +46,7 @@ public class Console {
      * Send a message to the console
      * @param message The message to send
      */
-    public static void log(String message) {
+    public void log(String message) {
         plugin.getLogger().info(message);
     }
 }
