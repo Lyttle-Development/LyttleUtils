@@ -10,6 +10,6 @@ public final class LyttleUtils extends JavaPlugin {
     public void onEnable() {
         // Print the plugin version
         this.console = new Console(this);
-        Console.log("LyttleUtils " + getDescription().getVersion() + " is enabled!");
+        console.log("LyttleUtils " + getDescription().getVersion() + " is enabled!");
     }
 }
