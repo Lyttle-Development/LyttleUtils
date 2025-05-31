@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
  */
 public class Message {
     private final JavaPlugin plugin;
+    private final Console console;
     private final Config messages;
     private MiniMessage miniMessage = MiniMessage.miniMessage();
 
@@ -31,6 +32,7 @@ public class Message {
     public Message(JavaPlugin plugin, Config messages) {
         this.plugin = plugin;
         this.messages = messages;
+        this.console = new Console(plugin);
     }
 
     /**
@@ -51,12 +53,12 @@ public class Message {
     private Component _getMessageFromMessagesConfig(String messageKey) {
         @Nullable String message = (String) messages.get(messageKey);
         if (message == null) {
-            Console.log("Message key " + messageKey + " not found in messages.yml");
+            console.log("Message key " + messageKey + " not found in messages.yml");
             message = (String) messages.get("message_not_found");
         }
 
         if (message == null) {
-            Console.log("Even the message_not_found not found in messages.yml...");
+            console.log("Even the message_not_found not found in messages.yml...");
             message = "&cOh... I can't react to that. (Contact the Administrators)";
         }
 
@@ -233,6 +235,8 @@ public class Message {
     private Component _cleanupMessage(Component message) {
         String messageString = miniMessage.serialize(message);
         // Replace all \n with real newlines
+        console.log("messageString: " + messageString);
+        messageString = messageString.replace("\\\n", "\n");
         messageString = messageString.replace("\\n", "\n");
         return miniMessage.deserialize(messageString);
     }
