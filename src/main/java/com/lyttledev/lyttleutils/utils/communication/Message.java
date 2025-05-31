@@ -84,7 +84,7 @@ public class Message {
         }
 
         // Replace all PlaceholderAPI placeholders
-        Placeholder.parsePlaceholders(player, message);
+        message = Placeholder.parsePlaceholders(player, message);
 
         return message;
     }
