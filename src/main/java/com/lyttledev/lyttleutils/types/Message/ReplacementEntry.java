@@ -1,15 +1,15 @@
 package com.lyttledev.lyttleutils.types.Message;
 
 public class ReplacementEntry {
-    private final ReplacementsKey key;
+    private final String key;
     private final String value;
 
-    public ReplacementEntry(ReplacementsKey key, String value) {
+    public ReplacementEntry(String key, String value) {
         this.key = key;
         this.value = value;
     }
 
-    public ReplacementsKey getKey() {
+    public String getKey() {
         return key;
     }
 

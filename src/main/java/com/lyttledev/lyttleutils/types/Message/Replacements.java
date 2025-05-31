@@ -18,7 +18,7 @@ public class Replacements {
         private final List<ReplacementEntry> entries = new ArrayList<>();
 
         public Builder add(String key, String value) {
-            entries.add(new ReplacementEntry(new ReplacementsKey(key), value));
+            entries.add(new ReplacementEntry(key, value));
             return this;
         }
 
@@ -30,9 +30,9 @@ public class Replacements {
     public static Replacements fromStringPairs(String[][] pairs) {
         ReplacementEntry[] entries = new ReplacementEntry[pairs.length];
         for (int i = 0; i < pairs.length; i++) {
-            String rawKey = pairs[i][0];
+            String key = pairs[i][0];
             String value = pairs[i][1];
-            entries[i] = new ReplacementEntry(new ReplacementsKey(rawKey), value);
+            entries[i] = new ReplacementEntry(key, value);
         }
         return new Replacements(List.of(entries));
     }
@@ -41,10 +41,9 @@ public class Replacements {
         return entries;
     }
 
-    public String getValueForKey(String rawKey) {
-        ReplacementsKey key = new ReplacementsKey(rawKey);
+    public String getValueForKey(String key) {
         for (ReplacementEntry entry : entries) {
-            if (entry.getKey().getValue().equals(key.getValue())) {
+            if (entry.getKey().equals(key)) {
                 return entry.getValue();
             }
         }
