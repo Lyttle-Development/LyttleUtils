@@ -1,10 +1,30 @@
 package com.lyttledev.lyttleutils.types.Message;
 
-public class Replacements {
-    private final ReplacementEntry[] entries;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Replacements(ReplacementEntry[] entries) {
+public class Replacements {
+    private final List<ReplacementEntry> entries;
+
+    private Replacements(List<ReplacementEntry> entries) {
         this.entries = entries;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final List<ReplacementEntry> entries = new ArrayList<>();
+
+        public Builder add(String key, String value) {
+            entries.add(new ReplacementEntry(new ReplacementsKey(key), value));
+            return this;
+        }
+
+        public Replacements build() {
+            return new Replacements(entries);
+        }
     }
 
     public static Replacements fromStringPairs(String[][] pairs) {
@@ -14,10 +34,10 @@ public class Replacements {
             String value = pairs[i][1];
             entries[i] = new ReplacementEntry(new ReplacementsKey(rawKey), value);
         }
-        return new Replacements(entries);
+        return new Replacements(List.of(entries));
     }
 
-    public ReplacementEntry[] getAll() {
+    public List<ReplacementEntry> getAll() {
         return entries;
     }
 
