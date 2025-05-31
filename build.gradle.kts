@@ -29,11 +29,13 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
     maven("https://jitpack.io")
     maven("https://repo.maven.apache.org/maven2/")
+    maven { url = uri("https://repo.extendedclip.com/releases/") }
 }
 
 // Dependencies
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 // run-paper plugin configuration
@@ -64,7 +66,7 @@ fun executeGitCommand(vararg command: String): String {
 fun latestCommitMessage(): String = executeGitCommand("log", "-1", "--pretty=%B")
 
 // Version string logic
-val versionString: String =  if (System.getenv("CHANNEL") == "Release") {
+val versionString: String = if (System.getenv("CHANNEL") == "Release") {
     version.toString()
 } else {
     val versionPrefix = if (System.getenv("CHANNEL") == "Snapshot") {

@@ -1,6 +1,7 @@
 package com.lyttledev.lyttleutils.utils.communication;
 
 import com.lyttledev.lyttleutils.types.Config;
+import com.lyttledev.lyttleutils.utils.convertion.Placeholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ public class Message {
     /**
      * Initialize the Message class with the plugin instance and messages configuration.
      *
-     * @param plugin  The JavaPlugin instance
+     * @param plugin   The JavaPlugin instance
      * @param messages The Config instance for messages
      */
     public Message(JavaPlugin plugin, Config messages) {
@@ -72,7 +73,7 @@ public class Message {
     /**
      * Get a message from the messages configuration with the prefix.
      *
-     * @param message The message string
+     * @param message      The message string
      * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
@@ -80,13 +81,17 @@ public class Message {
         for (String[] replacement : replacements) {
             message = message.replace(replacement[0], replacement[1]);
         }
+
+        // Replace all PlaceholderAPI placeholders
+        Placeholder.parsePlaceholders(message);
+
         return message;
     }
 
     /**
      * Send a message to a target (Player or ConsoleCommandSender).
      *
-     * @param target The target to send the message to
+     * @param target     The target to send the message to
      * @param messageKey The key for the message
      */
     public void sendMessage(Object target, String messageKey) {
@@ -97,8 +102,8 @@ public class Message {
     /**
      * Send a message to a target (Player or ConsoleCommandSender) with replacements.
      *
-     * @param target The target to send the message to
-     * @param message The message string
+     * @param target       The target to send the message to
+     * @param message      The message string
      * @param replacements The replacements to be made in the message
      */
     public void sendMessage(Object target, String message, String[][] replacements) {
@@ -109,7 +114,7 @@ public class Message {
     /**
      * Send a raw message to a target (Player or ConsoleCommandSender).
      *
-     * @param target The target to send the message to
+     * @param target  The target to send the message to
      * @param message The message string
      */
     public void sendMessageRaw(Object target, String message) {
@@ -120,7 +125,7 @@ public class Message {
     /**
      * Send a raw message to a target (Player or ConsoleCommandSender) without the prefix.
      *
-     * @param target The target to send the message to
+     * @param target  The target to send the message to
      * @param message The message string
      */
     private void _sendMessage(Object target, Component message) {
@@ -135,7 +140,7 @@ public class Message {
     /**
      * Send a message to all players on the server.
      *
-     * @param message The message string
+     * @param message      The message string
      * @param replacements The replacements to be made in the message
      */
     public void sendBroadcast(String message, String[][] replacements) {
@@ -146,9 +151,9 @@ public class Message {
     /**
      * Send a message to all players on the server with a prefix.
      *
-     * @param message The message string
+     * @param message      The message string
      * @param replacements The replacements to be made in the message
-     * @param prefix Whether to include the prefix or not
+     * @param prefix       Whether to include the prefix or not
      */
     public void sendBroadcast(String message, String[][] replacements, boolean prefix) {
         String msg = _replaceMessageStrings(_getConfigMessage(message), replacements);
@@ -159,7 +164,7 @@ public class Message {
      * Send a message to all players on the server with a prefix.
      *
      * @param message The message string
-     * @param prefix Whether to include the prefix or not
+     * @param prefix  Whether to include the prefix or not
      */
     public void sendBroadcast(String message, boolean prefix) {
         if (prefix) {
@@ -203,7 +208,7 @@ public class Message {
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param message The message string
+     * @param message      The message string
      * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
