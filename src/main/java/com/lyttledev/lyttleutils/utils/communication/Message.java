@@ -234,10 +234,12 @@ public class Message {
      */
     private Component _cleanupMessage(Component message) {
         String messageString = miniMessage.serialize(message);
+
         // Replace all \n with real newlines
-        console.log("messageString: " + messageString);
-        messageString = messageString.replace("\\\n", "\n");
         messageString = messageString.replace("\\n", "\n");
+        // Remove all backslashes
+        messageString = messageString.replace("\\", "");
+        
         return miniMessage.deserialize(messageString);
     }
 
