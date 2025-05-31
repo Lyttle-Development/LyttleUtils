@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 public class Message {
     private final JavaPlugin plugin;
     private final Config messages;
+    private MiniMessage miniMessage = MiniMessage.miniMessage();
 
     /**
      * Initialize the Message class with the plugin instance and messages configuration.
@@ -37,8 +38,8 @@ public class Message {
      *
      * @return The prefix string
      */
-    private String _getPrefix() {
-        return _getConfigMessage("prefix");
+    private Component _getPrefix() {
+        return _getMessageFromMessagesConfig("prefix");
     }
 
     /**
@@ -47,7 +48,7 @@ public class Message {
      * @param messageKey The key for the message
      * @return The message string
      */
-    private String _getConfigMessage(String messageKey) {
+    private Component _getMessageFromMessagesConfig(String messageKey) {
         @Nullable String message = (String) messages.get(messageKey);
         if (message == null) {
             Console.log("Message key " + messageKey + " not found in messages.yml");
@@ -59,7 +60,7 @@ public class Message {
             message = "&cOh... I can't react to that. (Contact the Administrators)";
         }
 
-        return message;
+        return miniMessage.deserialize(message);
     }
 
     /**
@@ -68,8 +69,8 @@ public class Message {
      * @param messageKey The key for the message
      * @return The message string
      */
-    public String getConfigMessage(String messageKey) {
-        return _getConfigMessage(messageKey);
+    public Component getConfigMessage(String messageKey) {
+        return _getMessageFromMessagesConfig(messageKey);
     }
 
     /**
@@ -80,15 +81,16 @@ public class Message {
      * @param player       The player to apply placeholders for
      * @return The formatted message string
      */
-    private String _replaceMessageStrings(String message, Replacements replacements, @Nullable Player player) {
+    private Component _replaceMessageStrings(Component message, Replacements replacements, @Nullable Player player) {
+        String messageString = miniMessage.serialize(message);
         for (ReplacementEntry replacement : replacements.getAll()) {
-            message = message.replace((CharSequence) replacement.getKey(), replacement.getValue());
+            messageString = messageString.replace((CharSequence) replacement.getKey(), replacement.getValue());
         }
 
         // Replace all PlaceholderAPI placeholders
-        message = Placeholder.parsePlaceholders(player, message);
+        messageString = Placeholder.parsePlaceholders(player, messageString);
 
-        return message;
+        return miniMessage.deserialize(messageString);
     }
 
     /**
@@ -98,7 +100,7 @@ public class Message {
      * @param messageKey The key for the message
      */
     public void sendMessage(Object target, String messageKey) {
-        Component msg = _getMessage(_getPrefix() + _getConfigMessage(messageKey));
+        Component msg = _cleanupMessage(_getPrefix(), _getMessageFromMessagesConfig(messageKey));
         _sendMessage(target, msg);
     }
 
@@ -111,7 +113,7 @@ public class Message {
      * @param player       The player to apply placeholders for
      */
     public void sendMessage(Object target, String message, Replacements replacements, @Nullable Player player) {
-        Component msg = _getMessage(_getPrefix() + _replaceMessageStrings(_getConfigMessage(message), replacements, player));
+        Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(_getMessageFromMessagesConfig(message), replacements, player));
         _sendMessage(target, msg);
     }
 
@@ -132,8 +134,8 @@ public class Message {
      * @param target  The target to send the message to
      * @param message The message string
      */
-    public void sendMessageRaw(Object target, String message) {
-        Component msg = _getMessage(_getPrefix() + message);
+    public void sendMessageRaw(Object target, Component message) {
+        Component msg = _cleanupMessage(_getPrefix(), message);
         _sendMessage(target, msg);
     }
 
@@ -155,48 +157,48 @@ public class Message {
     /**
      * Send a message to all players on the server.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      * @param player       The player to apply placeholders for
      */
-    public void sendBroadcast(String message, Replacements replacements, @Nullable Player player) {
-        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements, player);
-        Bukkit.broadcast(_getMessage(msg));
+    public void sendBroadcast(String messageKey, Replacements replacements, @Nullable Player player) {
+        Component msg = _replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player);
+        Bukkit.broadcast(_cleanupMessage(msg));
     }
 
     /**
      * Send a message to all players on the server.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      */
-    public void sendBroadcast(String message, Replacements replacements) {
-        sendBroadcast(message, replacements, null);
+    public void sendBroadcast(String messageKey, Replacements replacements) {
+        sendBroadcast(messageKey, replacements, null);
     }
 
     /**
      * Send a message to all players on the server with a prefix.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      * @param player       The player to apply placeholders for
      * @param prefix       Whether to include the prefix or not
      */
-    public void sendBroadcast(String message, Replacements replacements, boolean prefix, @Nullable Player player) {
-        String msg = _replaceMessageStrings(_getConfigMessage(message), replacements, player);
-        sendBroadcast(msg, prefix);
+    public void sendBroadcast(String messageKey, Replacements replacements, boolean prefix, @Nullable Player player) {
+        Component message = _replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player);
+        sendBroadcast(message, prefix);
     }
 
 
     /**
      * Send a message to all players on the server with a prefix.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      * @param prefix       Whether to include the prefix or not
      */
-    public void sendBroadcast(String message, Replacements replacements, boolean prefix) {
-        sendBroadcast(message, replacements, prefix, null);
+    public void sendBroadcast(String messageKey, Replacements replacements, boolean prefix) {
+        sendBroadcast(messageKey, replacements, prefix, null);
     }
 
     /**
@@ -205,12 +207,12 @@ public class Message {
      * @param message The message string
      * @param prefix  Whether to include the prefix or not
      */
-    public void sendBroadcast(String message, boolean prefix) {
+    public void sendBroadcast(Component message, boolean prefix) {
         if (prefix) {
-            Bukkit.broadcast(_getMessage(_getPrefix() + message));
+            Bukkit.broadcast(_cleanupMessage(_getPrefix(), message));
             return;
         }
-        Bukkit.broadcast(_getMessage(message));
+        Bukkit.broadcast(_cleanupMessage(message));
     }
 
     /**
@@ -218,8 +220,8 @@ public class Message {
      *
      * @param message The message string
      */
-    public void sendBroadcast(String message) {
-        Bukkit.broadcast(_getMessage(message));
+    public void sendBroadcast(Component message) {
+        Bukkit.broadcast(_cleanupMessage(message));
     }
 
     /**
@@ -228,42 +230,62 @@ public class Message {
      * @param message The message string
      * @return The formatted message string
      */
-    private Component _getMessage(String message) {
+    private Component _cleanupMessage(Component message) {
+        String messageString = miniMessage.serialize(message);
         // Replace all \n with real newlines
-        message = message.replace("\\n", "\n");
-        return MiniMessage.miniMessage().deserialize(message);
+        messageString = messageString.replace("\\n", "\n");
+        return miniMessage.deserialize(messageString);
+    }
+
+    /**
+     * Get a message from the messages configuration with the prefix.
+     *
+     * @param components The message string
+     * @return The formatted message string
+     */
+    private Component _cleanupMessage(Component... components) {
+        Component combined = _combineComponents(components);
+        return _cleanupMessage(combined);
+    }
+
+    private Component _combineComponents(Component... components) {
+        Component combined = Component.empty();
+        for (Component component : components) {
+            combined = combined.append(component);
+        }
+        return combined;
     }
 
     /**
      * Get a message from the messages configuration without the prefix.
      *
-     * @param message The message string
+     * @param messageKey The message key
      * @return The formatted message string
      */
-    public Component getMessage(String message) {
-        return _getMessage(_getConfigMessage(message));
+    public Component getMessage(String messageKey) {
+        return _cleanupMessage(_getMessageFromMessagesConfig(messageKey));
     }
 
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      * @param player       The player to apply placeholders for
      * @return The formatted message string
      */
-    public Component getMessage(String message, Replacements replacements, @Nullable Player player) {
-        return _getMessage(_replaceMessageStrings(_getConfigMessage(message), replacements, player));
+    public Component getMessage(String messageKey, Replacements replacements, @Nullable Player player) {
+        return _cleanupMessage(_replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player));
     }
 
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param message      The message string
+     * @param messageKey   The message key
      * @param replacements The replacements to be made in the message
      * @return The formatted message string
      */
-    public Component getMessage(String message, Replacements replacements) {
-        return getMessage(message, replacements, null);
+    public Component getMessage(String messageKey, Replacements replacements) {
+        return getMessage(messageKey, replacements, null);
     }
 }
