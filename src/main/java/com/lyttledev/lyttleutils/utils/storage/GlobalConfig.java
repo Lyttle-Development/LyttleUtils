@@ -6,11 +6,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.*;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 /**
  * GlobalConfig manages a single YAML-based configuration file shared by all plugins
  * placing it under "plugins/LyttleDevelopment/global.yml". It uses the shared Config type
- * to load, save, and migrate configuration entries.
+ * to load, save, and migrate configuration entries. Additionally, it watches the file
+ * for external changes and reloads its cache automatically.
  * <p>
  * Usage in any plugin:
  * <pre>
@@ -39,12 +43,14 @@ public class GlobalConfig {
 
     private final JavaPlugin plugin;
     private final Config config;
+    private WatchService watchService;
 
     /**
      * Constructs (and if necessary, initializes) the global.yml under
      * plugins/LyttleDevelopment/global.yml. If the directory or file does not exist,
      * it will be created and populated with default content. Afterwards, any migration
-     * based on config_version will run automatically.
+     * based on config_version will run automatically. Also starts a file watcher so that
+     * if global.yml is modified externally, the cached Config is reloaded.
      *
      * @param plugin any JavaPlugin instance (typically the plugin that is calling this)
      */
@@ -78,6 +84,9 @@ public class GlobalConfig {
 
         // Step 4: Trigger loading (and saving) so that cleanConfig runs, then migrate if needed
         migrateIfNeeded();
+
+        // Step 5: Start the file watcher on global.yml so that external changes reload the cache
+        startWatcher(globalFolder.toPath(), "global.yml");
     }
 
     /**
@@ -92,19 +101,66 @@ public class GlobalConfig {
         }
 
         switch (config.get("config_version").toString()) {
-//            case "0":
-//                // Migrate config entries.
-//
-//                // Update config version.
-//                config.set("config_version", 1);
-//
-//                // Recheck if the config is fully migrated.
-//                migrateIfNeeded();
-//                break;
+            // Example migration stubs:
+            // case "0":
+            //     // Perform migration from 0 → 1 here...
+            //     config.set("config_version", 1);
+            //     plugin.getLogger().info("Migrated global.yml from version 0 to 1");
+            //     migrateIfNeeded();
+            //     break;
 
             default:
                 // Already up‐to‐date (no further migrations)
                 break;
+        }
+    }
+
+    /**
+     * Starts a WatchService watching the given folder for modifications to the specified file name.
+     * When an external modify event on that file occurs, the local Config cache is reloaded.
+     *
+     * @param folderPath the folder containing the file to watch
+     * @param fileName   the exact file name to monitor (e.g. "global.yml")
+     */
+    private void startWatcher(Path folderPath, String fileName) {
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            folderPath.register(watchService, ENTRY_MODIFY);
+
+            Thread watcherThread = new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                    WatchKey key;
+                    try {
+                        key = watchService.take();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+                        if (kind == ENTRY_MODIFY) {
+                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                            Path changed = ev.context();
+                            if (changed.getFileName().toString().equals(fileName)) {
+                                // Reload the underlying Config
+                                config.reload();
+                                plugin.getLogger().info("Detected external change in global.yml; reloaded cache.");
+                            }
+                        }
+                    }
+
+                    boolean valid = key.reset();
+                    if (!valid) {
+                        break;
+                    }
+                }
+            }, "GlobalConfig-Watcher");
+
+            watcherThread.setDaemon(true);
+            watcherThread.start();
+        } catch (IOException e) {
+            plugin.getLogger().severe("Failed to start WatchService for global.yml: " + e.getMessage());
         }
     }
 
