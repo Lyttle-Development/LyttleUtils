@@ -62,12 +62,13 @@ public class Message {
 
         @Nullable String message = global.get(messageKey);
 
-        if (message != null) {
-            // If the message is found in the global config, deserialize it using MiniMessage
-            return miniMessage.deserialize(message);
+        if (message == null) {
+            // If the message is not found in the global config, fallback to messages.yml
+            return _getMessageFromMessagesConfig(messageKey);
         }
 
-        return _getMessageFromMessagesConfig(message);
+        // If the message is found in the global config, deserialize it using MiniMessage
+        return miniMessage.deserialize(message);
     }
 
     private Component _getMessageFromMessagesConfig(String messageKey) {
