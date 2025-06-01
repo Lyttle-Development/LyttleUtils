@@ -4,6 +4,7 @@ import com.lyttledev.lyttleutils.types.Config;
 import com.lyttledev.lyttleutils.types.Message.ReplacementEntry;
 import com.lyttledev.lyttleutils.types.Message.Replacements;
 import com.lyttledev.lyttleutils.utils.convertion.Placeholder;
+import com.lyttledev.lyttleutils.utils.storage.GlobalConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ public class Message {
     private final JavaPlugin plugin;
     private final Console console;
     private final Config messages;
+    private final GlobalConfig global;
     private MiniMessage miniMessage = MiniMessage.miniMessage();
 
     /**
@@ -29,9 +31,10 @@ public class Message {
      * @param plugin   The JavaPlugin instance
      * @param messages The Config instance for messages
      */
-    public Message(JavaPlugin plugin, Config messages) {
+    public Message(JavaPlugin plugin, Config messages, GlobalConfig global) {
         this.plugin = plugin;
         this.messages = messages;
+        this.global = global;
         this.console = new Console(plugin);
     }
 
@@ -41,7 +44,7 @@ public class Message {
      * @return The prefix string
      */
     private Component _getPrefix() {
-        return _getMessageFromMessagesConfig("prefix");
+        return _getMessageFromGlobalConfig("prefix");
     }
 
     /**
@@ -50,6 +53,27 @@ public class Message {
      * @param messageKey The key for the message
      * @return The message string
      */
+    private Component _getMessageFromGlobalConfig(String messageKey) {
+        // Check if the global config is enabled
+        if (!global.get("enabled").equalsIgnoreCase("true")) {
+            // If the global config is not enabled, fallback to messages.yml
+            return _getMessageFromMessagesConfig(messageKey);
+        }
+
+        @Nullable String message = (String) global.get(messageKey);
+        if (message == null) {
+            console.log("Message key " + messageKey + " not found in messages.yml");
+            message = (String) messages.get("message_not_found");
+        }
+
+        if (message != null) {
+            // If the message is found in the global config, deserialize it using MiniMessage
+            return miniMessage.deserialize(message);
+        }
+
+        return _getMessageFromMessagesConfig(message);
+    }
+
     private Component _getMessageFromMessagesConfig(String messageKey) {
         @Nullable String message = (String) messages.get(messageKey);
         if (message == null) {
@@ -72,7 +96,7 @@ public class Message {
      * @return The message string
      */
     public Component getConfigMessage(String messageKey) {
-        return _getMessageFromMessagesConfig(messageKey);
+        return _getMessageFromGlobalConfig(messageKey);
     }
 
     /**
@@ -102,7 +126,7 @@ public class Message {
      * @param messageKey The key for the message
      */
     public void sendMessage(Object target, String messageKey) {
-        Component msg = _cleanupMessage(_getPrefix(), _getMessageFromMessagesConfig(messageKey));
+        Component msg = _cleanupMessage(_getPrefix(), _getMessageFromGlobalConfig(messageKey));
         _sendMessage(target, msg);
     }
 
@@ -115,7 +139,7 @@ public class Message {
      * @param player       The player to apply placeholders for
      */
     public void sendMessage(Object target, String message, Replacements replacements, @Nullable Player player) {
-        Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(_getMessageFromMessagesConfig(message), replacements, player));
+        Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(_getMessageFromGlobalConfig(message), replacements, player));
         _sendMessage(target, msg);
     }
 
@@ -164,7 +188,7 @@ public class Message {
      * @param player       The player to apply placeholders for
      */
     public void sendBroadcast(String messageKey, Replacements replacements, @Nullable Player player) {
-        Component msg = _replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player);
+        Component msg = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player);
         Bukkit.broadcast(_cleanupMessage(msg));
     }
 
@@ -187,7 +211,7 @@ public class Message {
      * @param prefix       Whether to include the prefix or not
      */
     public void sendBroadcast(String messageKey, Replacements replacements, boolean prefix, @Nullable Player player) {
-        Component message = _replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player);
+        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player);
         sendBroadcast(message, prefix);
     }
 
@@ -239,7 +263,7 @@ public class Message {
         messageString = messageString.replace("\\n", "\n");
         // Remove all backslashes
         messageString = messageString.replace("\\", "");
-        
+
         return miniMessage.deserialize(messageString);
     }
 
@@ -269,7 +293,7 @@ public class Message {
      * @return The formatted message string
      */
     public Component getMessage(String messageKey) {
-        return _cleanupMessage(_getMessageFromMessagesConfig(messageKey));
+        return _cleanupMessage(_getMessageFromGlobalConfig(messageKey));
     }
 
     /**
@@ -281,7 +305,7 @@ public class Message {
      * @return The formatted message string
      */
     public Component getMessage(String messageKey, Replacements replacements, @Nullable Player player) {
-        return _cleanupMessage(_replaceMessageStrings(_getMessageFromMessagesConfig(messageKey), replacements, player));
+        return _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
     }
 
     /**

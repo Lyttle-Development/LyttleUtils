@@ -35,11 +35,26 @@ public class GlobalConfig {
     // Default contents for a fresh global.yml
     private static final String DEFAULT_CONFIG_CONTENT =
             "# Global configuration for all LyttleDevelopment plugins\n" +
-                    "config_version: 0\n" +
+                    "enabled: false\n" +
                     "\n" +
-                    "# You can add other default keys here:\n" +
-                    "# example:\n" +
-                    "# some_setting: \"default value\"\n";
+                    "################\n" +
+                    "# Message Prefix\n" +
+                    "################\n" +
+                    "prefix: <dark_aqua><bold>Lyttle<aqua><bold>Development<reset> <dark_gray>- <gray>\n" +
+                    "\n" +
+                    "##########################\n" +
+                    "# Generic Error Messages #\n" +
+                    "##########################\n" +
+                    "no_permission: <red>You do not have permission to do that!\n" +
+                    "player_not_found: <dark_red>Player not found\n" +
+                    "must_be_player: <red>You must be a player to use this command!\n" +
+                    "message_not_found: <red>Oh... I can't react to that. (Contact the Administrators)\n" +
+                    "\n" +
+                    "##########################\n" +
+                    "\n" +
+                    "# Used internally for configuration updates.\n" +
+                    "# ⚠\uFE0F Do not change this value.\n" +
+                    "config_version: 0";
 
     private final JavaPlugin plugin;
     private final Config config;
