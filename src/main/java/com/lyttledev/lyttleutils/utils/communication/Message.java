@@ -60,11 +60,7 @@ public class Message {
             return _getMessageFromMessagesConfig(messageKey);
         }
 
-        @Nullable String message = (String) global.get(messageKey);
-        if (message == null) {
-            console.log("Message key " + messageKey + " not found in messages.yml");
-            message = (String) messages.get("message_not_found");
-        }
+        @Nullable String message = global.get(messageKey);
 
         if (message != null) {
             // If the message is found in the global config, deserialize it using MiniMessage
