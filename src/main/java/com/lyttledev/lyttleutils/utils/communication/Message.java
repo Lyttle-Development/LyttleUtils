@@ -468,44 +468,88 @@ public class Message {
     /**
      * Get a message from the messages configuration without the prefix.
      *
-     * @param messageKey The key for the message
+     * @param message The key for the message
      * @return The message string
      */
-    public Component getMessageRaw(String messageKey) {
-        return _getMessageFromGlobalConfig(messageKey);
+    public Component getMessageRaw(Component message) {
+        return message;
+    }
+
+    /**
+     * Get a message from the messages configuration without the prefix.
+     *
+     * @param message The key for the message
+     * @return The message string
+     */
+    public Component getMessageRaw(String message) {
+        return miniMessage.deserialize(message);
     }
 
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param messageKey   The key for the message
+     * @param message      The key for the message
      * @param replacements The replacements to be made in the message
      * @return The message string
      */
-    public Component getMessageRaw(String messageKey, Replacements replacements) {
-        return _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements);
+    public Component getMessageRaw(Component message, Replacements replacements) {
+        return _replaceMessageStrings(message, replacements);
     }
 
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param messageKey The key for the message
-     * @param player     The player to apply placeholders for
+     * @param message      The key for the message
+     * @param replacements The replacements to be made in the message
      * @return The message string
      */
-    public Component getMessageRaw(String messageKey, @Nullable Player player) {
-        return _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player);
+    public Component getMessageRaw(String message, Replacements replacements) {
+        return _replaceMessageStrings(miniMessage.deserialize(message), replacements);
     }
 
     /**
      * Get a message from the messages configuration with replacements.
      *
-     * @param messageKey   The key for the message
+     * @param message The key for the message
+     * @param player  The player to apply placeholders for
+     * @return The message string
+     */
+    public Component getMessageRaw(Component message, @Nullable Player player) {
+        return _replaceMessageStrings(message, player);
+    }
+
+    /**
+     * Get a message from the messages configuration with replacements.
+     *
+     * @param message The key for the message
+     * @param player  The player to apply placeholders for
+     * @return The message string
+     */
+    public Component getMessageRaw(String message, @Nullable Player player) {
+        return _replaceMessageStrings(miniMessage.deserialize(message), player);
+    }
+
+    /**
+     * Get a message from the messages configuration with replacements.
+     *
+     * @param message      The key for the message
      * @param replacements The replacements to be made in the message
      * @param player       The player to apply placeholders for
      * @return The message string
      */
-    public Component getMessageRaw(String messageKey, Replacements replacements, @Nullable Player player) {
-        return _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player);
+    public Component getMessageRaw(Component message, Replacements replacements, @Nullable Player player) {
+        return _replaceMessageStrings(message, replacements, player);
+    }
+
+    /**
+     * Get a message from the messages configuration with replacements.
+     *
+     * @param message      The key for the message
+     * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     * @return The message string
+     */
+    public Component getMessageRaw(String message, Replacements replacements, @Nullable Player player) {
+        return _replaceMessageStrings(miniMessage.deserialize(message), replacements, player);
     }
 }
