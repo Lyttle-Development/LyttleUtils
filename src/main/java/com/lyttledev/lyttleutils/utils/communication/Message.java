@@ -472,7 +472,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(Component message) {
-        return message;
+        return miniMessage.deserialize(miniMessage.serialize(message));
     }
 
     /**
