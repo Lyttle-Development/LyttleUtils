@@ -1,11 +1,8 @@
 package com.lyttledev.lyttleutils.utils.convertion;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class Placeholder {
 
@@ -13,14 +10,9 @@ public class Placeholder {
         return Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
     }
 
-    private static boolean isProxyBridgeAvailable() {
-        return Bukkit.getPluginManager().getPlugin("PAPIProxyBridge") != null;
-    }
-
     /**
      * Parse placeholders by applying both native and proxy bridge in sequence.
-     * - First: resolve with native PlaceholderAPI if present.
-     * - Then: resolve with PAPIProxyBridge if available.
+     * - resolve with native PlaceholderAPI if present.
      *
      * @param player the player context (maybe null)
      * @param text   input text with placeholders
@@ -31,20 +23,7 @@ public class Placeholder {
 
         // 1) Native resolution if available
         if (isNativeLoaded()) {
-            result = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, result);
-        }
-
-        // 2) Proxy bridge resolution if available
-        if (isProxyBridgeAvailable()) {
-            try {
-                net.william278.papiproxybridge.api.PlaceholderAPI api = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
-                UUID playerId = (player != null ? player.getUniqueId() : null);
-                CompletableFuture<String> future = api.formatPlaceholders(result, playerId);
-                // wait for up to 3 seconds
-                result = future.get(3, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                // on timeout or error, keep the current result
-            }
+            result = PlaceholderAPI.setPlaceholders(player, result);
         }
 
         return result;
