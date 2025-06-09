@@ -351,7 +351,7 @@ public class Message {
      * @param replacements The replacements to be made in the message
      */
     public void sendBroadcast(String messageKey, Replacements replacements) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
         sendBroadcast(message);
     }
 
@@ -362,7 +362,7 @@ public class Message {
      * @param replacements The replacements to be made in the message
      */
     public void sendBroadcast(boolean prefix, String messageKey, Replacements replacements) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
         sendBroadcast(prefix, message);
     }
 
@@ -373,7 +373,7 @@ public class Message {
      * @param player     The player to apply placeholders for
      */
     public void sendBroadcast(String messageKey, @Nullable Player player) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player));
         sendBroadcast(message);
     }
 
@@ -384,7 +384,7 @@ public class Message {
      * @param player     The player to apply placeholders for
      */
     public void sendBroadcast(boolean prefix, String messageKey, @Nullable Player player) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player));
         sendBroadcast(prefix, message);
     }
 
@@ -396,7 +396,7 @@ public class Message {
      * @param player       The player to apply placeholders for
      */
     public void sendBroadcast(String messageKey, Replacements replacements, @Nullable Player player) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
         sendBroadcast(message);
     }
 
@@ -408,7 +408,7 @@ public class Message {
      * @param player       The player to apply placeholders for
      */
     public void sendBroadcast(boolean prefix, String messageKey, Replacements replacements, @Nullable Player player) {
-        Component message = _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player);
+        Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
         sendBroadcast(prefix, message);
     }
 
@@ -472,7 +472,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(Component message) {
-        return miniMessage.deserialize(miniMessage.serialize(message));
+        return _cleanupMessage(message);
     }
 
     /**
@@ -482,7 +482,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message) {
-        return miniMessage.deserialize(message);
+        return _cleanupMessage(miniMessage.deserialize(message));
     }
 
     /**
@@ -493,7 +493,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(Component message, Replacements replacements) {
-        return _replaceMessageStrings(message, replacements);
+        return _cleanupMessage(_replaceMessageStrings(message, replacements));
     }
 
     /**
@@ -504,7 +504,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, Replacements replacements) {
-        return _replaceMessageStrings(miniMessage.deserialize(message), replacements);
+        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), replacements));
     }
 
     /**
@@ -515,7 +515,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(Component message, @Nullable Player player) {
-        return _replaceMessageStrings(message, player);
+        return _cleanupMessage(_replaceMessageStrings(message, player));
     }
 
     /**
@@ -526,7 +526,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, @Nullable Player player) {
-        return _replaceMessageStrings(miniMessage.deserialize(message), player);
+        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), player));
     }
 
     /**
@@ -538,7 +538,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(Component message, Replacements replacements, @Nullable Player player) {
-        return _replaceMessageStrings(message, replacements, player);
+        return _cleanupMessage(_replaceMessageStrings(message, replacements, player));
     }
 
     /**
@@ -550,6 +550,6 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, Replacements replacements, @Nullable Player player) {
-        return _replaceMessageStrings(miniMessage.deserialize(message), replacements, player);
+        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), replacements, player));
     }
 }
