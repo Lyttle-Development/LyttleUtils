@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Placeholder {
+    static net.william278.papiproxybridge.api.PlaceholderAPI papiproxybridgeApi;
 
     private static boolean isNativeLoaded() {
         return Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
@@ -29,22 +30,25 @@ public class Placeholder {
     public static String parsePlaceholders(Player player, String text) {
         String result = text;
 
-        // 1) Native resolution if available
-        if (isNativeLoaded()) {
-            result = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, result);
-        }
-
-        // 2) Proxy bridge resolution if available
+        // Proxy bridge resolution if available
         if (isProxyBridgeAvailable()) {
             try {
-                net.william278.papiproxybridge.api.PlaceholderAPI api = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
+                if (papiproxybridgeApi == null) {
+                    papiproxybridgeApi = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
+                }
                 UUID playerId = (player != null ? player.getUniqueId() : null);
-                CompletableFuture<String> future = api.formatPlaceholders(result, playerId);
+                CompletableFuture<String> future = papiproxybridgeApi.formatPlaceholders(result, playerId);
                 // wait for up to 3 seconds
                 result = future.get(3, TimeUnit.SECONDS);
             } catch (Exception e) {
                 // on timeout or error, keep the current result
+                System.err.println("Error resolving placeholders with PAPIProxyBridge: " + e.getMessage());
             }
+        }
+
+        // Native resolution if available
+        if (isNativeLoaded()) {
+            result = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, result);
         }
 
         return result;
