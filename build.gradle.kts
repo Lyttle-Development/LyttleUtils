@@ -30,14 +30,12 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.maven.apache.org/maven2/")
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
-    maven("https://repo.william278.net/releases/") // PAPI Proxy Bridge
 }
 
 // Dependencies
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("net.william278:papiproxybridge:1.8.1")
 }
 
 // run-paper plugin configuration

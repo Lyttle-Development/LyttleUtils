@@ -3,29 +3,9 @@ package com.lyttledev.lyttleutils.utils.convertion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
 public class Placeholder {
-    static net.william278.papiproxybridge.api.PlaceholderAPI papiproxybridgeApi;
-
     private static boolean isNativeLoaded() {
         return Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
-    }
-
-    private static boolean isProxyBridgeAvailable() {
-        boolean isAvailable = Bukkit.getPluginManager().getPlugin("PAPIProxyBridge") != null;
-
-        if (isAvailable && papiproxybridgeApi == null) {
-            try {
-                papiproxybridgeApi = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
-            } catch (Exception e) {
-                System.err.println("Failed to create PAPIProxyBridge instance: " + e.getMessage());
-                isAvailable = false; // fallback to native if proxy bridge fails
-            }
-        }
-        return isAvailable;
     }
 
     /**
@@ -39,25 +19,6 @@ public class Placeholder {
      */
     public static String parsePlaceholders(Player player, String text) {
         String result = text;
-
-        // Proxy bridge resolution if available
-        if (isProxyBridgeAvailable()) {
-            try {
-                UUID playerId = (player != null ? player.getUniqueId() : null);
-                if (playerId != null) {
-                    CompletableFuture<String> future = papiproxybridgeApi.formatPlaceholders(result, playerId);
-                    // wait for up to 3 seconds
-                    result = future.get(3, TimeUnit.SECONDS);
-                } else {
-                    // If player is null, log message
-                    System.err.println("Player is null, cannot resolve placeholders with PAPIProxyBridge.");
-                }
-            } catch (Exception e) {
-                System.err.println("Failed to resolve placeholders with PAPIProxyBridge: " + e.getMessage());
-                // Fallback to original text if there's an error
-                return text;
-            }
-        }
 
         // Native resolution if available
         if (isNativeLoaded()) {
