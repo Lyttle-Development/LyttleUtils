@@ -15,7 +15,17 @@ public class Placeholder {
     }
 
     private static boolean isProxyBridgeAvailable() {
-        return Bukkit.getPluginManager().getPlugin("PAPIProxyBridge") != null;
+        boolean isAvailable = Bukkit.getPluginManager().getPlugin("PAPIProxyBridge") != null;
+
+        if (isAvailable && papiproxybridgeApi == null) {
+            try {
+                papiproxybridgeApi = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
+            } catch (Exception e) {
+                System.err.println("Failed to create PAPIProxyBridge instance: " + e.getMessage());
+                isAvailable = false; // fallback to native if proxy bridge fails
+            }
+        }
+        return isAvailable;
     }
 
     /**
@@ -33,16 +43,19 @@ public class Placeholder {
         // Proxy bridge resolution if available
         if (isProxyBridgeAvailable()) {
             try {
-                if (papiproxybridgeApi == null) {
-                    papiproxybridgeApi = net.william278.papiproxybridge.api.PlaceholderAPI.createInstance();
-                }
                 UUID playerId = (player != null ? player.getUniqueId() : null);
-                CompletableFuture<String> future = papiproxybridgeApi.formatPlaceholders(result, playerId);
-                // wait for up to 3 seconds
-                result = future.get(3, TimeUnit.SECONDS);
+                if (playerId != null) {
+                    CompletableFuture<String> future = papiproxybridgeApi.formatPlaceholders(result, playerId);
+                    // wait for up to 3 seconds
+                    result = future.get(3, TimeUnit.SECONDS);
+                } else {
+                    // If player is null, log message
+                    System.err.println("Player is null, cannot resolve placeholders with PAPIProxyBridge.");
+                }
             } catch (Exception e) {
-                // on timeout or error, keep the current result
-                System.err.println("Error resolving placeholders with PAPIProxyBridge: " + e.getMessage());
+                System.err.println("Failed to resolve placeholders with PAPIProxyBridge: " + e.getMessage());
+                // Fallback to original text if there's an error
+                return text;
             }
         }
 
