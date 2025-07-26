@@ -27,17 +27,19 @@ public class Config {
         if (this.config == null) {
             try {
                 // read the config as a string
-                String configString = Files.readString(Paths.get(pluginFolderPath, configPath));
+                String originalConfigString = Files.readString(Paths.get(pluginFolderPath, configPath));
 
                 // clean the config string
-                configString = this.cleanConfig(configString);
+                String configString = this.cleanConfig(originalConfigString);
 
                 // load the config from the string
                 this.config = new YamlConfiguration();
                 this.config.loadFromString(configString);
 
-                // save the cleaned config
-                this.saveConfig();
+                // Save the cleaned config back to the file if it has changed
+                if (!configString.equals(originalConfigString)) {
+                    this.saveConfig();
+                }
             } catch (IOException | InvalidConfigurationException ignored) {
                 this.config = null;
             }
@@ -63,19 +65,20 @@ public class Config {
         try {
             // Retrieve the configuration and a backup of the original configuration
             String originalConfigString = config.saveToString();
-            String configString = config.saveToString();
 
             try {
-                configString = this.cleanConfig(configString);
+                String configString = this.cleanConfig(originalConfigString);
 
                 // Save the modified configuration back to the file
                 config.loadFromString(configString);
                 config.save(new File(pluginFolderPath, configPath));
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
 
             // Reload the original config
             config.loadFromString(originalConfigString);
-        } catch (InvalidConfigurationException ignored) { }
+        } catch (InvalidConfigurationException ignored) {
+        }
     }
 
     public void reload() {
