@@ -23,7 +23,7 @@ public class Message {
     private final Console console;
     private final Config messages;
     private final GlobalConfig global;
-    private MiniMessage miniMessage = MiniMessage.miniMessage();
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     /**
      * Initialize the Message class with the plugin instance and messages configuration.
@@ -49,6 +49,16 @@ public class Message {
      */
     private Component _getPrefix() {
         return _getMessageFromGlobalConfig("prefix");
+    }
+
+    /**
+     * Get the prefix from the messages configuration based on the enabled state.
+     *
+     * @param enabled
+     * @return
+     */
+    private Component _getPrefix(Boolean enabled) {
+        return enabled ? _getMessageFromGlobalConfig("prefix") : Component.empty();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,6 +243,17 @@ public class Message {
     }
 
     /**
+     * Send a message to a target (Player or ConsoleCommandSender).
+     *
+     * @param target     The target to send the message to
+     * @param messageKey The key for the message
+     */
+    public void sendMessage(boolean prefix, Object target, String messageKey) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _getMessageFromGlobalConfig(messageKey));
+        _sendMessage(target, msg);
+    }
+
+    /**
      * Send a message to a target (Player or ConsoleCommandSender) with replacements.
      *
      * @param target       The target to send the message to
@@ -241,6 +262,18 @@ public class Message {
      */
     public void sendMessage(Object target, String messageKey, Replacements replacements) {
         Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a message to a target (Player or ConsoleCommandSender) with replacements.
+     *
+     * @param target       The target to send the message to
+     * @param messageKey   The message string
+     * @param replacements The replacements to be made in the message
+     */
+    public void sendMessage(boolean prefix, Object target, String messageKey, Replacements replacements) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
         _sendMessage(target, msg);
     }
 
@@ -263,8 +296,32 @@ public class Message {
      * @param messageKey The message string
      * @param player     The player to apply placeholders for
      */
+    public void sendMessage(boolean prefix, Object target, String messageKey, @Nullable Player player) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a message to a target (Player or ConsoleCommandSender) with replacements.
+     *
+     * @param target     The target to send the message to
+     * @param messageKey The message string
+     * @param player     The player to apply placeholders for
+     */
     public void sendMessage(Object target, String messageKey, Replacements replacements, @Nullable Player player) {
         Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a message to a target (Player or ConsoleCommandSender) with replacements.
+     *
+     * @param target     The target to send the message to
+     * @param messageKey The message string
+     * @param player     The player to apply placeholders for
+     */
+    public void sendMessage(boolean prefix, Object target, String messageKey, Replacements replacements, @Nullable Player player) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
         _sendMessage(target, msg);
     }
 
@@ -289,8 +346,30 @@ public class Message {
      * @param target  The target to send the message to
      * @param message The message string
      */
+    public void sendMessageRaw(boolean prefix, Object target, Component message) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), message);
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a raw message to a target (Player or ConsoleCommandSender).
+     *
+     * @param target  The target to send the message to
+     * @param message The message string
+     */
     public void sendMessageRaw(Object target, Component message, Replacements replacements) {
         Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(message, replacements));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a raw message to a target (Player or ConsoleCommandSender).
+     *
+     * @param target  The target to send the message to
+     * @param message The message string
+     */
+    public void sendMessageRaw(boolean prefix, Object target, Component message, Replacements replacements) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(message, replacements));
         _sendMessage(target, msg);
     }
 
@@ -311,13 +390,35 @@ public class Message {
      * @param target  The target to send the message to
      * @param message The message string
      */
+    public void sendMessageRaw(boolean prefix, Object target, Component message, @Nullable Player player) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(message, player));
+        _sendMessage(target, msg);
+    }
+
+    /**
+     * Send a raw message to a target (Player or ConsoleCommandSender).
+     *
+     * @param target  The target to send the message to
+     * @param message The message string
+     */
     public void sendMessageRaw(Object target, Component message, Replacements replacements, @Nullable Player player) {
         Component msg = _cleanupMessage(_getPrefix(), _replaceMessageStrings(message, replacements, player));
         _sendMessage(target, msg);
     }
 
+    /**
+     * Send a raw message to a target (Player or ConsoleCommandSender).
+     *
+     * @param target  The target to send the message to
+     * @param message The message string
+     */
+    public void sendMessageRaw(boolean prefix, Object target, Component message, Replacements replacements, @Nullable Player player) {
+        Component msg = _cleanupMessage(_getPrefix(prefix), _replaceMessageStrings(message, replacements, player));
+        _sendMessage(target, msg);
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Send Raw Message
+    // Send Broadcast
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -337,11 +438,7 @@ public class Message {
      * @param message The message string
      */
     public void sendBroadcast(boolean prefix, Component message) {
-        if (prefix) {
-            Bukkit.broadcast(_cleanupMessage(_getPrefix(), message));
-            return;
-        }
-        Bukkit.broadcast(_cleanupMessage(message));
+        Bukkit.broadcast(_cleanupMessage(_getPrefix(prefix), message));
     }
 
     /**
@@ -409,6 +506,98 @@ public class Message {
      */
     public void sendBroadcast(boolean prefix, String messageKey, Replacements replacements, @Nullable Player player) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
+        sendBroadcast(prefix, message);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Send Raw Broadcast
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * Send a message to all players on the server without a prefix.
+     *
+     * @param message The message string
+     */
+    public void sendBroadcastRaw(Component message) {
+        Bukkit.broadcast(_cleanupMessage(message));
+    }
+
+    /**
+     * Send a message to all players on the server with a prefix.
+     *
+     * @param prefix  Whether to include the prefix or not
+     * @param message The message string
+     */
+    public void sendBroadcastRaw(boolean prefix, Component message) {
+        Bukkit.broadcast(_cleanupMessage(_getPrefix(prefix), message));
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message      The message key
+     * @param replacements The replacements to be made in the message
+     */
+    public void sendBroadcastRaw(Component message, Replacements replacements) {
+        message = _cleanupMessage(_replaceMessageStrings(message, replacements));
+        sendBroadcast(message);
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message      The message key
+     * @param replacements The replacements to be made in the message
+     */
+    public void sendBroadcastRaw(boolean prefix, Component message, Replacements replacements) {
+        message = _cleanupMessage(_replaceMessageStrings(message, replacements));
+        sendBroadcast(prefix, message);
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message The message key
+     * @param player  The player to apply placeholders for
+     */
+    public void sendBroadcastRaw(Component message, @Nullable Player player) {
+        message = _cleanupMessage(_replaceMessageStrings(message, player));
+        sendBroadcast(message);
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message The message key
+     * @param player  The player to apply placeholders for
+     */
+    public void sendBroadcastRaw(boolean prefix, Component message, @Nullable Player player) {
+        message = _cleanupMessage(_replaceMessageStrings(message, player));
+        sendBroadcast(prefix, message);
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message      The message key
+     * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     */
+    public void sendBroadcastRaw(Component message, Replacements replacements, @Nullable Player player) {
+        message = _cleanupMessage(_replaceMessageStrings(message, replacements, player));
+        sendBroadcast(message);
+    }
+
+    /**
+     * Send a message to all players on the server.
+     *
+     * @param message      The message
+     * @param replacements The replacements to be made in the message
+     * @param player       The player to apply placeholders for
+     */
+    public void sendBroadcastRaw(boolean prefix, Component message, Replacements replacements, @Nullable Player player) {
+        message = _cleanupMessage(_replaceMessageStrings(message, replacements, player));
         sendBroadcast(prefix, message);
     }
 
