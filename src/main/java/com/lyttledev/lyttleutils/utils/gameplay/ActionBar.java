@@ -3,16 +3,18 @@ package com.lyttledev.lyttleutils.utils.gameplay;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+
+import static com.lyttledev.lyttleutils.utils.communication.Console.plugin;
+
 
 public class ActionBar {
 
     private static final HashMap<Player, BukkitTask> activeActionBars = new HashMap<>();
 
-    public static void setActionBar(boolean active, Player player, Component message, JavaPlugin plugin) {
+    public static void setActionBar(boolean active, Player player, Component message) {
         BukkitTask oldActionBarTask = activeActionBars.get(player);
         // If there is an old action bar task, cancel it before overwriting it
         if (oldActionBarTask != null) {
