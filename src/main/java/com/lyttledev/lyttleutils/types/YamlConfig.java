@@ -15,23 +15,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Config utility class for managing plugin configuration files.
+ * YamlConfig utility class for managing plugin configuration files.
  * Supports robust access to all possible YAML types and ensures safe reading/writing.
  * Includes defensive checks, comments, and reload/save routines.
  */
-public class Config {
+public class YamlConfig {
     private final String pluginFolderPath;
     private final String configPath;
     private YamlConfiguration config = null;
     private final JavaPlugin plugin;
 
     /**
-     * Initialize Config with plugin and config file path.
+     * Initialize YamlConfig with plugin and config file path.
      *
      * @param plugin     The JavaPlugin instance.
      * @param configPath The config file name or relative path.
      */
-    public Config(JavaPlugin plugin, String configPath) {
+    public YamlConfig(JavaPlugin plugin, String configPath) {
         this.pluginFolderPath = plugin.getDataFolder().getPath();
         this.configPath = configPath;
         this.plugin = plugin;

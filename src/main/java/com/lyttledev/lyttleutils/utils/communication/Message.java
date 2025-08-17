@@ -1,8 +1,8 @@
 package com.lyttledev.lyttleutils.utils.communication;
 
-import com.lyttledev.lyttleutils.types.Config;
 import com.lyttledev.lyttleutils.types.Message.ReplacementEntry;
 import com.lyttledev.lyttleutils.types.Message.Replacements;
+import com.lyttledev.lyttleutils.types.YamlConfig;
 import com.lyttledev.lyttleutils.utils.convertion.Placeholder;
 import com.lyttledev.lyttleutils.utils.storage.GlobalConfig;
 import net.kyori.adventure.text.Component;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public class Message {
     private final JavaPlugin plugin;
     private final Console console;
-    private final Config messages;
+    private final YamlConfig messages;
     private final GlobalConfig global;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
@@ -29,9 +29,9 @@ public class Message {
      * Initialize the Message class with the plugin instance and messages configuration.
      *
      * @param plugin   The JavaPlugin instance
-     * @param messages The Config instance for messages
+     * @param messages The YamlConfig instance for messages
      */
-    public Message(JavaPlugin plugin, Config messages, GlobalConfig global) {
+    public Message(JavaPlugin plugin, YamlConfig messages, GlobalConfig global) {
         this.plugin = plugin;
         this.messages = messages;
         this.global = global;
@@ -62,7 +62,7 @@ public class Message {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // UTIL: Get Message from Global Config
+    // UTIL: Get Message from Global YamlConfig
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -602,7 +602,7 @@ public class Message {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Get Config Message
+    // Get YamlConfig Message
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -651,7 +651,7 @@ public class Message {
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Get Config Message (RAW)
+    // Get YamlConfig Message (RAW)
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**

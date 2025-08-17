@@ -1,6 +1,6 @@
 package com.lyttledev.lyttleutils.utils.storage;
 
-import com.lyttledev.lyttleutils.types.Config;
+import com.lyttledev.lyttleutils.types.YamlConfig;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -12,7 +12,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 /**
  * GlobalConfig manages a single YAML-based configuration file shared by all plugins
- * placing it under "plugins/LyttleDevelopment/global.yml". It uses the shared Config type
+ * placing it under "plugins/LyttleDevelopment/global.yml". It uses the shared YamlConfig type
  * to load, save, and migrate configuration entries. Additionally, it watches the file
  * for external changes and reloads its cache automatically.
  * <p>
@@ -57,7 +57,7 @@ public class GlobalConfig {
                     "config_version: 0";
 
     private final JavaPlugin plugin;
-    private final Config config;
+    private final YamlConfig config;
     private WatchService watchService;
 
     /**
@@ -65,7 +65,7 @@ public class GlobalConfig {
      * plugins/LyttleDevelopment/global.yml. If the directory or file does not exist,
      * it will be created and populated with default content. Afterwards, any migration
      * based on config_version will run automatically. Also starts a file watcher so that
-     * if global.yml is modified externally, the cached Config is reloaded.
+     * if global.yml is modified externally, the cached YamlConfig is reloaded.
      *
      * @param plugin any JavaPlugin instance (typically the plugin that is calling this)
      */
@@ -94,8 +94,8 @@ public class GlobalConfig {
             }
         }
 
-        // Step 3: Instantiate the shared Config object, pointing it at "../LyttleDevelopment/global.yml"
-        this.config = new Config(plugin, RELATIVE_CONFIG_PATH);
+        // Step 3: Instantiate the shared YamlConfig object, pointing it at "../LyttleDevelopment/global.yml"
+        this.config = new YamlConfig(plugin, RELATIVE_CONFIG_PATH);
 
         // Step 4: Trigger loading (and saving) so that cleanConfig runs, then migrate if needed
         migrateIfNeeded();
@@ -132,7 +132,7 @@ public class GlobalConfig {
 
     /**
      * Starts a WatchService watching the given folder for modifications to the specified file name.
-     * When an external modify event on that file occurs, the local Config cache is reloaded.
+     * When an external modify event on that file occurs, the local YamlConfig cache is reloaded.
      *
      * @param folderPath the folder containing the file to watch
      * @param fileName   the exact file name to monitor (e.g. "global.yml")
@@ -158,7 +158,7 @@ public class GlobalConfig {
                             WatchEvent<Path> ev = (WatchEvent<Path>) event;
                             Path changed = ev.context();
                             if (changed.getFileName().toString().equals(fileName)) {
-                                // Reload the underlying Config
+                                // Reload the underlying YamlConfig
                                 config.reload();
                                 plugin.getLogger().info("Detected external change in global.yml; reloaded cache.");
                             }
