@@ -207,6 +207,7 @@ public class Message {
      * @return The formatted message string
      */
     private Component _cleanupMessage(Component message) {
+        // Convert Component to string with MiniMessage formatting
         String messageString = miniMessage.serialize(message);
 
         // Replace all \n with real newlines
@@ -214,11 +215,13 @@ public class Message {
         // Remove all backslashes
         messageString = messageString.replace("\\", "");
 
-        // Support legacy color codes
-        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(messageString);
-        messageString = MiniMessage.miniMessage().serialize(component);
+        // Deserialize back to Component
+        Component cleaned = MiniMessage.miniMessage().deserialize(messageString);
 
-        return miniMessage.deserialize(messageString);
+        // Support legacy color codes by serializing to legacy, then parsing back
+        String legacySerialized = LegacyComponentSerializer.legacyAmpersand().serialize(cleaned);
+        // Return as a Component (MiniMessage tags already handled)
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(legacySerialized);
     }
 
     /**
