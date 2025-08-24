@@ -7,6 +7,7 @@ import com.lyttledev.lyttleutils.utils.convertion.Placeholder;
 import com.lyttledev.lyttleutils.utils.storage.GlobalConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -214,7 +215,8 @@ public class Message {
         messageString = messageString.replace("\\", "");
 
         // Support legacy color codes
-        messageString = messageString.replace("&", "§");
+        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(messageString);
+        messageString = MiniMessage.miniMessage().serialize(component);
 
         return miniMessage.deserialize(messageString);
     }
