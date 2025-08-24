@@ -213,6 +213,9 @@ public class Message {
         // Remove all backslashes
         messageString = messageString.replace("\\", "");
 
+        // Support legacy color codes
+        messageString = messageString.replace("&", "§");
+
         return miniMessage.deserialize(messageString);
     }
 
