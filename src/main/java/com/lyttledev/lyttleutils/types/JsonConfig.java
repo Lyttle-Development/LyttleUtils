@@ -17,6 +17,9 @@ import java.util.Set;
  * JsonConfig utility for managing plugin configuration files using JSON (GSON).
  * Supports robust access to all possible JSON types, safe reading/writing, mapping to POJOs, and custom accessors.
  * Includes defensive checks, comments, and reload/save routines.
+ * <p>
+ * All get* methods support an optional defaultValue parameter.
+ * If the key does not exist, returns the default (or null if not set).
  *
  * @param <T> The POJO data class to map the config file to.
  */
@@ -132,60 +135,121 @@ public class JsonConfig<T> {
         getConfig();
     }
 
-    // --------- Custom JSON accessors for dot notation & primitives ----------
+    // ------------------------------------------------------------------------
+    // All get functions with optional default value parameter.
+    // If the key does not exist, returns the default (or null if not set).
+    // ------------------------------------------------------------------------
 
+    /**
+     * Generic getter, returns Object (use type-specific for safety).
+     *
+     * @param path Path to value.
+     */
     public @Nullable Object get(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return element != null ? gson.fromJson(element, Object.class) : null;
+        return get(path, null);
     }
 
+    public @Nullable Object get(String path, @Nullable Object defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return element != null ? gson.fromJson(element, Object.class) : defaultValue;
+    }
+
+    /**
+     * Get a String from config, or default if not present.
+     */
     public @Nullable String getString(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonPrimitive()) ? element.getAsString() : null;
+        return getString(path, null);
     }
 
+    public @Nullable String getString(String path, @Nullable String defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonPrimitive()) ? element.getAsString() : defaultValue;
+    }
+
+    /**
+     * Get an Integer from config, or default if not present.
+     */
     public @Nullable Integer getInt(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonPrimitive()) ? element.getAsInt() : null;
+        return getInt(path, null);
     }
 
+    public @Nullable Integer getInt(String path, @Nullable Integer defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonPrimitive()) ? element.getAsInt() : defaultValue;
+    }
+
+    /**
+     * Get a Long from config, or default if not present.
+     */
     public @Nullable Long getLong(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonPrimitive()) ? element.getAsLong() : null;
+        return getLong(path, null);
     }
 
+    public @Nullable Long getLong(String path, @Nullable Long defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonPrimitive()) ? element.getAsLong() : defaultValue;
+    }
+
+    /**
+     * Get a Double from config, or default if not present.
+     */
     public @Nullable Double getDouble(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonPrimitive()) ? element.getAsDouble() : null;
+        return getDouble(path, null);
     }
 
+    public @Nullable Double getDouble(String path, @Nullable Double defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonPrimitive()) ? element.getAsDouble() : defaultValue;
+    }
+
+    /**
+     * Get a Boolean from config, or default if not present.
+     */
     public @Nullable Boolean getBoolean(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonPrimitive()) ? element.getAsBoolean() : null;
+        return getBoolean(path, null);
     }
 
+    public @Nullable Boolean getBoolean(String path, @Nullable Boolean defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonPrimitive()) ? element.getAsBoolean() : defaultValue;
+    }
+
+    /**
+     * Get a List<?> from config, or default if not present.
+     */
     public @Nullable List<?> getList(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonArray()) ? gson.fromJson(element, List.class) : null;
+        return getList(path, null);
     }
 
-    public @Nullable List<String> getStringList(String path) {
+    public @Nullable List<?> getList(String path, @Nullable List<?> defaultValue) {
         JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonArray()) ? gson.fromJson(element, List.class) : defaultValue;
+    }
+
+    /**
+     * Get a List<String> from config, or default if not present.
+     */
+    public @Nullable List<String> getStringList(String path) {
+        return getStringList(path, null);
+    }
+
+    public @Nullable List<String> getStringList(String path, @Nullable List<String> defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
         JsonElement element = getElementByPath(cfg, path);
         if (element != null && element.isJsonArray()) {
             List<String> list = new ArrayList<>();
@@ -194,12 +258,19 @@ public class JsonConfig<T> {
             });
             return list;
         }
-        return null;
+        return defaultValue;
     }
 
+    /**
+     * Get a List<Integer> from config, or default if not present.
+     */
     public @Nullable List<Integer> getIntegerList(String path) {
+        return getIntegerList(path, null);
+    }
+
+    public @Nullable List<Integer> getIntegerList(String path, @Nullable List<Integer> defaultValue) {
         JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
+        if (cfg == null) return defaultValue;
         JsonElement element = getElementByPath(cfg, path);
         if (element != null && element.isJsonArray()) {
             List<Integer> list = new ArrayList<>();
@@ -208,12 +279,19 @@ public class JsonConfig<T> {
             });
             return list;
         }
-        return null;
+        return defaultValue;
     }
 
+    /**
+     * Get a List<Double> from config, or default if not present.
+     */
     public @Nullable List<Double> getDoubleList(String path) {
+        return getDoubleList(path, null);
+    }
+
+    public @Nullable List<Double> getDoubleList(String path, @Nullable List<Double> defaultValue) {
         JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
+        if (cfg == null) return defaultValue;
         JsonElement element = getElementByPath(cfg, path);
         if (element != null && element.isJsonArray()) {
             List<Double> list = new ArrayList<>();
@@ -222,12 +300,19 @@ public class JsonConfig<T> {
             });
             return list;
         }
-        return null;
+        return defaultValue;
     }
 
+    /**
+     * Get a List<Boolean> from config, or default if not present.
+     */
     public @Nullable List<Boolean> getBooleanList(String path) {
+        return getBooleanList(path, null);
+    }
+
+    public @Nullable List<Boolean> getBooleanList(String path, @Nullable List<Boolean> defaultValue) {
         JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
+        if (cfg == null) return defaultValue;
         JsonElement element = getElementByPath(cfg, path);
         if (element != null && element.isJsonArray()) {
             List<Boolean> list = new ArrayList<>();
@@ -236,23 +321,64 @@ public class JsonConfig<T> {
             });
             return list;
         }
-        return null;
+        return defaultValue;
     }
 
+    /**
+     * Get a Map<String,Object> from config, or default if not present.
+     */
     public @Nullable Map<String, Object> getMap(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonObject()) ? gson.fromJson(element, Map.class) : null;
+        return getMap(path, null);
     }
 
+    public @Nullable Map<String, Object> getMap(String path, @Nullable Map<String, Object> defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonObject()) ? gson.fromJson(element, Map.class) : defaultValue;
+    }
+
+    /**
+     * Get a Set<String> of keys at path, or default if not present.
+     */
     public @Nullable Set<String> getKeySet(String path) {
-        JsonObject cfg = this.getConfig();
-        if (cfg == null) return null;
-        JsonElement element = getElementByPath(cfg, path);
-        return (element != null && element.isJsonObject()) ? element.getAsJsonObject().keySet() : null;
+        return getKeySet(path, null);
     }
 
+    public @Nullable Set<String> getKeySet(String path, @Nullable Set<String> defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        return (element != null && element.isJsonObject()) ? element.getAsJsonObject().keySet() : defaultValue;
+    }
+
+    /**
+     * Get a List<Map<?,?>> (list of objects/sections) from config, or default if not present.
+     */
+    public @Nullable List<Map<?, ?>> getMapList(String path) {
+        return getMapList(path, null);
+    }
+
+    public @Nullable List<Map<?, ?>> getMapList(String path, @Nullable List<Map<?, ?>> defaultValue) {
+        JsonObject cfg = this.getConfig();
+        if (cfg == null) return defaultValue;
+        JsonElement element = getElementByPath(cfg, path);
+        if (element != null && element.isJsonArray()) {
+            List<Map<?, ?>> list = new ArrayList<>();
+            element.getAsJsonArray().forEach(e -> {
+                if (e != null && e.isJsonObject()) {
+                    list.add(gson.fromJson(e, Map.class));
+                }
+            });
+            return list;
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get a nested JsonObject section at path.
+     * Returns null if not present.
+     */
     public @Nullable JsonObject getSection(String path) {
         JsonObject cfg = this.getConfig();
         if (cfg == null) return null;
@@ -260,12 +386,28 @@ public class JsonConfig<T> {
         return (element != null && element.isJsonObject()) ? element.getAsJsonObject() : null;
     }
 
+    // ------------------------------------------------------------------------
+    // Mutators and utility methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Set a value at path and persist to disk.
+     *
+     * @param path  The config path.
+     * @param value The new value.
+     */
     public void set(String path, @Nullable Object value) {
         JsonObject cfg = this.getConfig();
         setElementByPath(cfg, path, gson.toJsonTree(value));
         saveConfig();
     }
 
+    /**
+     * Remove a value at path (removes key and saves).
+     *
+     * @param path The config path.
+     * @return true if removed, false if not present.
+     */
     public boolean remove(String path) {
         JsonObject cfg = this.getConfig();
         boolean removed = removeElementByPath(cfg, path);
@@ -273,11 +415,17 @@ public class JsonConfig<T> {
         return removed;
     }
 
+    /**
+     * Check existence of key at path.
+     */
     public boolean contains(String path) {
         JsonObject cfg = this.getConfig();
         return cfg != null && getElementByPath(cfg, path) != null;
     }
 
+    /**
+     * Check existence of key (case-insensitive).
+     */
     public boolean containsLowercase(String path) {
         JsonObject cfg = this.getConfig();
         if (cfg == null) return false;
@@ -287,16 +435,29 @@ public class JsonConfig<T> {
         return false;
     }
 
+    /**
+     * Get all immediate child keys under path as an array.
+     */
     public String[] getKeys(String path) {
         Set<String> keys = getKeySet(path);
         return keys != null ? keys.toArray(new String[0]) : null;
     }
 
+    /**
+     * Get all values at path as an Object array.
+     *
+     * @param path The config section path.
+     * @return All values, or empty array if none.
+     */
     public Object[] getAll(String path) {
         Map<String, Object> map = getMap(path);
         return map != null ? map.values().toArray(new Object[0]) : new Object[0];
     }
 
+    /**
+     * Remove all top-level keys from config and reloads.
+     * Use with caution!
+     */
     public void clear() {
         if (new File(this.pluginFolderPath, this.configPath).delete()) {
             this.reload();
@@ -305,6 +466,9 @@ public class JsonConfig<T> {
 
     // ---------- Path helpers for dot-notation JSON -------------
 
+    /**
+     * Retrieve nested JsonElement by dot-separated path (e.g. "foo.bar.baz").
+     */
     private JsonElement getElementByPath(JsonObject obj, String path) {
         String[] parts = path.split("\\.");
         JsonElement current = obj;
@@ -317,6 +481,9 @@ public class JsonConfig<T> {
         return current;
     }
 
+    /**
+     * Set nested JsonElement by dot-separated path, creating parents as needed.
+     */
     private void setElementByPath(JsonObject obj, String path, JsonElement value) {
         String[] parts = path.split("\\.");
         JsonObject current = obj;
@@ -331,6 +498,9 @@ public class JsonConfig<T> {
         current.add(parts[parts.length - 1], value);
     }
 
+    /**
+     * Remove nested value by dot-separated path.
+     */
     private boolean removeElementByPath(JsonObject obj, String path) {
         String[] parts = path.split("\\.");
         JsonObject current = obj;

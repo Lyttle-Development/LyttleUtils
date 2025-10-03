@@ -18,6 +18,9 @@ import java.util.Set;
  * YamlConfig utility class for managing plugin configuration files.
  * Supports robust access to all possible YAML types and ensures safe reading/writing.
  * Includes defensive checks, comments, and reload/save routines.
+ * <p>
+ * All get* methods support an optional defaultValue parameter.
+ * If the key does not exist, returns the default (or null if not set).
  */
 public class YamlConfig {
     private final String pluginFolderPath;
@@ -80,6 +83,7 @@ public class YamlConfig {
      * @return Cleaned string.
      */
     private String cleanConfig(String configString) {
+        // Remove type tags and unsafe YAML constructs
         configString = configString.replaceAll("!!.+", "");
         return configString;
     }
@@ -113,85 +117,199 @@ public class YamlConfig {
         this.config = YamlConfiguration.loadConfiguration(new File(this.pluginFolderPath, this.configPath));
     }
 
+    // ------------------------------------------------------------------------
+    // All get functions with optional default value parameter.
+    // If the key does not exist, returns the default (or null if not set).
+    // ------------------------------------------------------------------------
+
     /**
      * Generic getter, returns Object (use type-specific for safety).
+     *
+     * @param path         Path to value.
+     * @param defaultValue Value to return if not present (optional).
      */
     public @Nullable Object get(String path) {
+        return get(path, null);
+    }
+
+    public @Nullable Object get(String path, @Nullable Object defaultValue) {
         YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.get(path) : null;
+        return cfg != null && cfg.contains(path) ? cfg.get(path) : defaultValue;
     }
 
     /**
-     * Getters for all common Bukkit YAML config types
-     **/
-
+     * Get a String from config, or default if not present.
+     */
     public @Nullable String getString(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getString(path) : null;
+        return getString(path, null);
     }
 
+    public @Nullable String getString(String path, @Nullable String defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getString(path) : defaultValue;
+    }
+
+    /**
+     * Get an Integer from config, or default if not present.
+     */
     public @Nullable Integer getInt(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getInt(path) : null;
+        return getInt(path, null);
     }
 
+    public @Nullable Integer getInt(String path, @Nullable Integer defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getInt(path) : defaultValue;
+    }
+
+    /**
+     * Get a Long from config, or default if not present.
+     */
     public @Nullable Long getLong(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getLong(path) : null;
+        return getLong(path, null);
     }
 
+    public @Nullable Long getLong(String path, @Nullable Long defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getLong(path) : defaultValue;
+    }
+
+    /**
+     * Get a Double from config, or default if not present.
+     */
     public @Nullable Double getDouble(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getDouble(path) : null;
+        return getDouble(path, null);
     }
 
+    public @Nullable Double getDouble(String path, @Nullable Double defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getDouble(path) : defaultValue;
+    }
+
+    /**
+     * Get a Boolean from config, or default if not present.
+     */
     public @Nullable Boolean getBoolean(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getBoolean(path) : null;
+        return getBoolean(path, null);
     }
 
+    public @Nullable Boolean getBoolean(String path, @Nullable Boolean defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getBoolean(path) : defaultValue;
+    }
+
+    /**
+     * Get a List<?> from config, or default if not present.
+     */
     public @Nullable List<?> getList(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getList(path) : null;
+        return getList(path, null);
     }
 
+    public @Nullable List<?> getList(String path, @Nullable List<?> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getList(path) : defaultValue;
+    }
+
+    /**
+     * Get a List<String> from config, or default if not present.
+     */
     public @Nullable List<String> getStringList(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getStringList(path) : null;
+        return getStringList(path, null);
     }
 
+    public @Nullable List<String> getStringList(String path, @Nullable List<String> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        List<String> list = (cfg != null && cfg.contains(path)) ? cfg.getStringList(path) : null;
+        return list != null ? list : defaultValue;
+    }
+
+    /**
+     * Get a List<Integer> from config, or default if not present.
+     */
     public @Nullable List<Integer> getIntegerList(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getIntegerList(path) : null;
+        return getIntegerList(path, null);
     }
 
+    public @Nullable List<Integer> getIntegerList(String path, @Nullable List<Integer> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        List<Integer> list = (cfg != null && cfg.contains(path)) ? cfg.getIntegerList(path) : null;
+        return list != null ? list : defaultValue;
+    }
+
+    /**
+     * Get a List<Double> from config, or default if not present.
+     */
     public @Nullable List<Double> getDoubleList(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getDoubleList(path) : null;
+        return getDoubleList(path, null);
     }
 
+    public @Nullable List<Double> getDoubleList(String path, @Nullable List<Double> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        List<Double> list = (cfg != null && cfg.contains(path)) ? cfg.getDoubleList(path) : null;
+        return list != null ? list : defaultValue;
+    }
+
+    /**
+     * Get a List<Boolean> from config, or default if not present.
+     */
     public @Nullable List<Boolean> getBooleanList(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getBooleanList(path) : null;
+        return getBooleanList(path, null);
     }
 
+    public @Nullable List<Boolean> getBooleanList(String path, @Nullable List<Boolean> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        List<Boolean> list = (cfg != null && cfg.contains(path)) ? cfg.getBooleanList(path) : null;
+        return list != null ? list : defaultValue;
+    }
+
+    /**
+     * Get a Map<String,Object> from config, or default if not present.
+     */
     public @Nullable Map<String, Object> getMap(String path) {
-        YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getConfigurationSection(path).getValues(false) : null;
+        return getMap(path, null);
     }
 
-    public @Nullable Set<String> getKeySet(String path) {
+    public @Nullable Map<String, Object> getMap(String path, @Nullable Map<String, Object> defaultValue) {
         YamlConfiguration cfg = this.getConfig();
-        return cfg != null && cfg.contains(path) ? cfg.getConfigurationSection(path).getKeys(false) : null;
+        return cfg != null && cfg.contains(path) ? cfg.getConfigurationSection(path).getValues(false) : defaultValue;
+    }
+
+    /**
+     * Get a Set<String> of keys at path, or default if not present.
+     */
+    public @Nullable Set<String> getKeySet(String path) {
+        return getKeySet(path, null);
+    }
+
+    public @Nullable Set<String> getKeySet(String path, @Nullable Set<String> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        return cfg != null && cfg.contains(path) ? cfg.getConfigurationSection(path).getKeys(false) : defaultValue;
+    }
+
+    /**
+     * Get a List<Map<?,?>> (list of objects/sections) from config, or default if not present.
+     */
+    public @Nullable List<Map<?, ?>> getMapList(String path) {
+        return getMapList(path, null);
+    }
+
+    public @Nullable List<Map<?, ?>> getMapList(String path, @Nullable List<Map<?, ?>> defaultValue) {
+        YamlConfiguration cfg = this.getConfig();
+        List<Map<?, ?>> list = (cfg != null && cfg.contains(path)) ? cfg.getMapList(path) : null;
+        return list != null ? list : defaultValue;
     }
 
     /**
      * Get a nested ConfigurationSection at path.
+     * Returns null if not present.
      */
     public @Nullable ConfigurationSection getSection(String path) {
         YamlConfiguration cfg = this.getConfig();
         return cfg != null && cfg.contains(path) ? cfg.getConfigurationSection(path) : null;
     }
+
+    // ------------------------------------------------------------------------
+    // Mutators and utility methods
+    // ------------------------------------------------------------------------
 
     /**
      * Set a value at path and persist to disk.
