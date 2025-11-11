@@ -433,20 +433,20 @@ public class Message {
     /**
      * Send a message to all players on the server without a prefix.
      *
-     * @param message The message string
+     * @param messageKey   The message key
      */
-    public void sendBroadcast(Component message) {
-        Bukkit.broadcast(_cleanupMessage(message));
+    public void sendBroadcast(String messageKey) {
+        Bukkit.broadcast(_cleanupMessage(_getMessageFromGlobalConfig(messageKey)));
     }
 
     /**
      * Send a message to all players on the server with a prefix.
      *
      * @param prefix  Whether to include the prefix or not
-     * @param message The message string
+     * @param messageKey   The message key
      */
-    public void sendBroadcast(boolean prefix, Component message) {
-        Bukkit.broadcast(_cleanupMessage(_getPrefix(prefix), message));
+    public void sendBroadcast(boolean prefix, String messageKey) {
+        Bukkit.broadcast(_cleanupMessage(_getPrefix(prefix), _getMessageFromGlobalConfig(messageKey)));
     }
 
     /**
@@ -457,7 +457,7 @@ public class Message {
      */
     public void sendBroadcast(String messageKey, Replacements replacements) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -468,7 +468,7 @@ public class Message {
      */
     public void sendBroadcast(boolean prefix, String messageKey, Replacements replacements) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     /**
@@ -479,7 +479,7 @@ public class Message {
      */
     public void sendBroadcast(String messageKey, @Nullable Player player) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -490,7 +490,7 @@ public class Message {
      */
     public void sendBroadcast(boolean prefix, String messageKey, @Nullable Player player) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), player));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     /**
@@ -502,7 +502,7 @@ public class Message {
      */
     public void sendBroadcast(String messageKey, Replacements replacements, @Nullable Player player) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -514,7 +514,7 @@ public class Message {
      */
     public void sendBroadcast(boolean prefix, String messageKey, Replacements replacements, @Nullable Player player) {
         Component message = _cleanupMessage(_replaceMessageStrings(_getMessageFromGlobalConfig(messageKey), replacements, player));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -549,7 +549,7 @@ public class Message {
      */
     public void sendBroadcastRaw(Component message, Replacements replacements) {
         message = _cleanupMessage(_replaceMessageStrings(message, replacements));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -560,7 +560,7 @@ public class Message {
      */
     public void sendBroadcastRaw(boolean prefix, Component message, Replacements replacements) {
         message = _cleanupMessage(_replaceMessageStrings(message, replacements));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     /**
@@ -571,7 +571,7 @@ public class Message {
      */
     public void sendBroadcastRaw(Component message, @Nullable Player player) {
         message = _cleanupMessage(_replaceMessageStrings(message, player));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -582,7 +582,7 @@ public class Message {
      */
     public void sendBroadcastRaw(boolean prefix, Component message, @Nullable Player player) {
         message = _cleanupMessage(_replaceMessageStrings(message, player));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     /**
@@ -594,7 +594,7 @@ public class Message {
      */
     public void sendBroadcastRaw(Component message, Replacements replacements, @Nullable Player player) {
         message = _cleanupMessage(_replaceMessageStrings(message, replacements, player));
-        sendBroadcast(message);
+        sendBroadcastRaw(message);
     }
 
     /**
@@ -606,7 +606,7 @@ public class Message {
      */
     public void sendBroadcastRaw(boolean prefix, Component message, Replacements replacements, @Nullable Player player) {
         message = _cleanupMessage(_replaceMessageStrings(message, replacements, player));
-        sendBroadcast(prefix, message);
+        sendBroadcastRaw(prefix, message);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
