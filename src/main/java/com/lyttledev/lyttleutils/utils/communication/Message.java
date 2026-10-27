@@ -12,6 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +22,10 @@ import javax.annotation.Nullable;
  * It uses MiniMessage for formatting and supports message replacement.
  */
 public class Message {
+    private static final Pattern LEGACY_FORMATTING_CODE = Pattern.compile(
+        "(?i)(?:[§&]#[0-9a-f]{6}|[§&]x(?:[§&][0-9a-f]){6}|[§&][0-9a-fk-or])"
+    );
+
     private final JavaPlugin plugin;
     private final Console console;
     private final YamlConfig messages;
@@ -37,6 +43,68 @@ public class Message {
         this.messages = messages;
         this.global = global;
         this.console = new Console(plugin);
+    }
+
+    private Component _deserializeMiniMessage(String message) {
+        Matcher matcher = LEGACY_FORMATTING_CODE.matcher(message);
+        StringBuilder normalized = new StringBuilder(message.length());
+        int previousEnd = 0;
+        while (matcher.find()) {
+            normalized.append(message, previousEnd, matcher.start());
+            normalized.append(_legacyFormattingCodeToMiniMessage(matcher.group()));
+            previousEnd = matcher.end();
+        }
+        normalized.append(message, previousEnd, message.length());
+        return miniMessage.deserialize(normalized.toString());
+    }
+
+    private String _legacyFormattingCodeToMiniMessage(String code) {
+        if (code.length() == 8 && code.charAt(1) == '#') {
+            return "<#" + code.substring(2) + ">";
+        }
+
+        if (code.length() == 14 && Character.toLowerCase(code.charAt(1)) == 'x') {
+            StringBuilder hexColor = new StringBuilder(6);
+            for (int i = 3; i < code.length(); i += 2) {
+                hexColor.append(code.charAt(i));
+            }
+            return "<#" + hexColor + ">";
+        }
+
+        char legacyCode = Character.toLowerCase(code.charAt(code.length() - 1));
+        String tag = switch (legacyCode) {
+            case '0' -> "black";
+            case '1' -> "dark_blue";
+            case '2' -> "dark_green";
+            case '3' -> "dark_aqua";
+            case '4' -> "dark_red";
+            case '5' -> "dark_purple";
+            case '6' -> "gold";
+            case '7' -> "gray";
+            case '8' -> "dark_gray";
+            case '9' -> "blue";
+            case 'a' -> "green";
+            case 'b' -> "aqua";
+            case 'c' -> "red";
+            case 'd' -> "light_purple";
+            case 'e' -> "yellow";
+            case 'f' -> "white";
+            case 'k' -> "obfuscated";
+            case 'l' -> "bold";
+            case 'm' -> "strikethrough";
+            case 'n' -> "underlined";
+            case 'o' -> "italic";
+            case 'r' -> "reset";
+            default -> null;
+        };
+        if (tag == null) {
+            return code;
+        }
+        return switch (legacyCode) {
+            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ->
+                "<reset><" + tag + ">";
+            default -> "<" + tag + ">";
+        };
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +155,7 @@ public class Message {
         }
 
         // If the message is found in the global config, deserialize it using MiniMessage
-        return miniMessage.deserialize(message);
+        return _deserializeMiniMessage(message);
     }
 
     private Component _getMessageFromMessagesConfig(String messageKey) {
@@ -102,7 +170,7 @@ public class Message {
             message = "&cOh... I can't react to that. (Contact the Administrators)";
         }
 
-        return miniMessage.deserialize(message);
+        return _deserializeMiniMessage(message);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +194,7 @@ public class Message {
         // Replace all PlaceholderAPI placeholders
         messageString = Placeholder.parsePlaceholders(player, messageString);
 
-        return miniMessage.deserialize(messageString);
+        return _deserializeMiniMessage(messageString);
     }
 
     /**
@@ -145,7 +213,7 @@ public class Message {
         // Replace all PlaceholderAPI placeholders
         messageString = Placeholder.parsePlaceholders(null, messageString);
 
-        return miniMessage.deserialize(messageString);
+        return _deserializeMiniMessage(messageString);
     }
 
     /**
@@ -161,7 +229,7 @@ public class Message {
         // Replace all PlaceholderAPI placeholders
         messageString = Placeholder.parsePlaceholders(player, messageString);
 
-        return miniMessage.deserialize(messageString);
+        return _deserializeMiniMessage(messageString);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +284,7 @@ public class Message {
         messageString = messageString.replace("\\", "");
 
         // Deserialize back to Component
-        Component cleaned = MiniMessage.miniMessage().deserialize(messageString);
+        Component cleaned = _deserializeMiniMessage(messageString);
 
         // Support legacy color codes by serializing to legacy, then parsing back
         String legacySerialized = LegacyComponentSerializer.legacyAmpersand().serialize(cleaned);
@@ -679,7 +747,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message) {
-        return _cleanupMessage(miniMessage.deserialize(message));
+        return _cleanupMessage(_deserializeMiniMessage(message));
     }
 
     /**
@@ -701,7 +769,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, Replacements replacements) {
-        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), replacements));
+        return _cleanupMessage(_replaceMessageStrings(_deserializeMiniMessage(message), replacements));
     }
 
     /**
@@ -723,7 +791,7 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, @Nullable Player player) {
-        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), player));
+        return _cleanupMessage(_replaceMessageStrings(_deserializeMiniMessage(message), player));
     }
 
     /**
@@ -747,6 +815,6 @@ public class Message {
      * @return The message string
      */
     public Component getMessageRaw(String message, Replacements replacements, @Nullable Player player) {
-        return _cleanupMessage(_replaceMessageStrings(miniMessage.deserialize(message), replacements, player));
+        return _cleanupMessage(_replaceMessageStrings(_deserializeMiniMessage(message), replacements, player));
     }
 }
