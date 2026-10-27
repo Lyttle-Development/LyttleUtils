@@ -35,7 +35,7 @@ repositories {
 // Dependencies
 dependencies {
     compileOnly("io.papermc.paper:paper-api:" + (property("paperVersion") as String) + "-R0.1-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.11.7")
 }
 
 // run-paper plugin configuration
@@ -91,6 +91,12 @@ tasks.named<ProcessResources>("processResources") {
             "version" to versionString,
             "projectVersion" to versionString
         )
+    }
+}
+
+tasks.processResources {
+    filesMatching("paper-plugin.yml") {
+        expand(project.properties)
     }
 }
 
